@@ -1,0 +1,2716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three Layers — an interactive HTML / CSS / JS cheat sheet</title>
+<meta name="description" content="A live, editable reference for HTML structure, CSS style, and JavaScript behavior.">
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --ink:        #08090F;
+  --slab:       #101322;
+  --slab-2:     #161A2C;
+  --line:       #232840;
+  --mist:       #8E96B8;
+  --bone:       #E9ECF7;
+
+  --ember:      #FF6B3D;  /* HTML — structure */
+  --periwinkle: #6E8CFF;  /* CSS  — style     */
+  --citrine:    #FFC940;  /* JS   — behavior  */
+  --jade:       #38D9A9;  /* do this          */
+  --rose:       #FF5C7A;  /* avoid this       */
+
+  --accent: var(--ember);
+
+  --font-display: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  --rail: 252px;
+  --r: 10px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:96px}
+body{
+  margin:0;
+  background:var(--ink);
+  color:var(--bone);
+  font-family:var(--font-ui);
+  font-size:15px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(900px 500px at 12% -8%, #FF6B3D14, transparent 60%),
+    radial-gradient(800px 520px at 88% 4%, #6E8CFF14, transparent 60%),
+    radial-gradient(700px 500px at 50% 100%, #FFC94010, transparent 60%);
+}
+::selection{background:var(--accent);color:var(--ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+
+/* ============================================================
+   TOP BAR
+   ============================================================ */
+.topbar{
+  position:sticky;top:0;z-index:60;
+  display:flex;align-items:center;gap:16px;
+  padding:12px 22px;
+  background:#08090Fdd;
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+}
+.brand{
+  font-family:var(--font-display);
+  font-size:13px;font-weight:700;letter-spacing:-.02em;
+  display:flex;align-items:center;gap:9px;white-space:nowrap;
+}
+.brand .dots{display:flex;gap:4px}
+.brand .dots i{width:8px;height:8px;border-radius:50%;display:block}
+.brand .dots i:nth-child(1){background:var(--ember)}
+.brand .dots i:nth-child(2){background:var(--periwinkle)}
+.brand .dots i:nth-child(3){background:var(--citrine)}
+
+.search{flex:1;max-width:520px;margin-left:auto;position:relative}
+.search input{
+  width:100%;padding:9px 74px 9px 34px;
+  background:var(--slab);border:1px solid var(--line);border-radius:var(--r);
+  color:var(--bone);font-family:var(--font-ui);font-size:14px;
+}
+.search input::placeholder{color:#5C6489}
+.search input:focus{outline:none;border-color:var(--periwinkle);box-shadow:0 0 0 3px #6E8CFF22}
+.search .mag{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#5C6489;font-size:13px}
+.search kbd{
+  position:absolute;right:9px;top:50%;transform:translateY(-50%);
+  font-family:var(--font-display);font-size:10px;color:#5C6489;
+  border:1px solid var(--line);border-radius:5px;padding:2px 6px;background:#0C0E19;
+}
+.topbar .count{font-family:var(--font-display);font-size:11px;color:var(--mist);white-space:nowrap}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.shell{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);gap:0;position:relative;z-index:1}
+.rail{
+  position:sticky;top:57px;align-self:start;height:calc(100vh - 57px);
+  overflow-y:auto;padding:26px 14px 60px;border-right:1px solid var(--line);
+  scrollbar-width:thin;
+}
+.rail::-webkit-scrollbar{width:8px}
+.rail::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+.rail h4{
+  font-family:var(--font-display);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--rail-accent,var(--mist));margin:20px 0 8px;padding-left:10px;
+}
+.rail a{
+  display:block;padding:5px 10px;border-radius:7px;color:var(--mist);
+  text-decoration:none;font-size:13.5px;border-left:2px solid transparent;
+}
+.rail a:hover{color:var(--bone);background:var(--slab)}
+.rail a.on{color:var(--bone);background:var(--slab);border-left-color:var(--rail-accent,var(--accent))}
+
+main{padding:0 34px 140px;max-width:1180px;min-width:0}
+
+/* ============================================================
+   HERO — THE LAYER STACK
+   ============================================================ */
+.hero{padding:64px 0 40px;display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+.eyebrow{
+  font-family:var(--font-display);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--mist);margin-bottom:18px;
+}
+.hero h1{
+  font-family:var(--font-display);font-weight:700;letter-spacing:-.05em;line-height:.92;
+  font-size:clamp(38px,6.4vw,74px);margin:0 0 20px;
+}
+.hero h1 span{display:block}
+.hero h1 .a{color:var(--ember)}
+.hero h1 .b{color:var(--periwinkle)}
+.hero h1 .c{color:var(--citrine)}
+.hero p.lede{color:var(--mist);font-size:16.5px;max-width:46ch;margin:0 0 26px}
+.hero .cta{display:flex;gap:10px;flex-wrap:wrap}
+.btn{
+  font-family:var(--font-display);font-size:12.5px;
+  padding:10px 16px;border-radius:var(--r);cursor:pointer;
+  background:var(--slab);border:1px solid var(--line);color:var(--bone);
+  text-decoration:none;display:inline-block;
+}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.solid{background:var(--accent);border-color:var(--accent);color:#0A0B12;font-weight:700}
+.btn.solid:hover{filter:brightness(1.12);color:#0A0B12}
+
+.stagewrap{display:flex;flex-direction:column;gap:14px}
+.stage{
+  perspective:1400px;height:330px;display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.plate{
+  position:absolute;width:250px;height:170px;border-radius:14px;
+  transform-style:preserve-3d;
+  transform:rotateX(56deg) rotateZ(-40deg) translateZ(var(--z));
+  border:1px solid var(--pc);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--pc) 22%,transparent),color-mix(in srgb,var(--pc) 5%,transparent));
+  box-shadow:0 22px 50px #0008;
+  transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s,filter .3s;
+  cursor:pointer;
+}
+.plate .tag{
+  position:absolute;left:14px;bottom:12px;
+  font-family:var(--font-display);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--pc);text-shadow:0 2px 8px #000;
+}
+.plate .glyph{position:absolute;right:14px;top:10px;font-family:var(--font-display);font-size:13px;color:var(--pc);opacity:.75}
+.plate[aria-pressed="false"]{opacity:.22;filter:grayscale(1)}
+.plate:hover{transform:rotateX(56deg) rotateZ(-40deg) translateZ(calc(var(--z) + 22px))}
+.plate.p1{--z:0px;--pc:var(--ember);z-index:1}
+.plate.p2{--z:78px;--pc:var(--periwinkle);z-index:2}
+.plate.p3{--z:156px;--pc:var(--citrine);z-index:3}
+.plate .grid-lines{position:absolute;inset:12px;border:1px dashed color-mix(in srgb,var(--pc) 45%,transparent);border-radius:8px}
+
+.toggles{display:flex;gap:8px}
+.toggles button{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  font-family:var(--font-display);font-size:12px;letter-spacing:.08em;
+  padding:10px 8px;border-radius:var(--r);cursor:pointer;
+  background:var(--slab);border:1px solid var(--line);color:var(--mist);
+  transition:color .2s,border-color .2s,background .2s;
+}
+.toggles button::before{
+  content:"";width:9px;height:9px;border-radius:50%;
+  background:transparent;border:1.5px solid currentColor;transition:background .2s;
+}
+.toggles button[aria-pressed="true"]{
+  color:var(--tc);border-color:color-mix(in srgb,var(--tc) 55%,transparent);
+  background:color-mix(in srgb,var(--tc) 10%,transparent);
+}
+.toggles button[aria-pressed="true"]::before{background:currentColor}
+.toggles button:hover{border-color:var(--tc)}
+.toggles .t-html{--tc:var(--ember)}
+.toggles .t-css{--tc:var(--periwinkle)}
+.toggles .t-js{--tc:var(--citrine)}
+
+.stage-demo{
+  border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fff;height:150px;
+}
+.stage-demo iframe{width:100%;height:100%;border:0;display:block}
+.stage-hint{font-family:var(--font-display);font-size:11px;color:var(--mist);text-align:center}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+.layer{scroll-margin-top:90px}
+.layer-head{
+  display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;
+  padding:56px 0 8px;border-bottom:1px solid var(--line);margin-bottom:34px;
+}
+.layer-head .num{
+  font-family:var(--font-display);font-size:64px;font-weight:700;letter-spacing:-.06em;
+  color:var(--accent);line-height:.8;
+}
+.layer-head h2{
+  font-family:var(--font-display);font-size:34px;font-weight:700;letter-spacing:-.045em;margin:0;
+}
+.layer-head .role{
+  font-family:var(--font-display);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--mist);margin-bottom:6px;
+}
+.layer-head p{color:var(--mist);margin:0 0 6px;flex:1;min-width:260px;font-size:14.5px}
+
+.group{margin-bottom:44px;scroll-margin-top:90px}
+.group > h3{
+  font-family:var(--font-display);font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 4px;display:flex;align-items:center;gap:10px;
+}
+.group > h3::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.group > .note{color:var(--mist);font-size:13.5px;margin:0 0 16px;max-width:78ch}
+
+.cards{display:grid;gap:14px}
+.card{
+  background:var(--slab);border:1px solid var(--line);border-radius:var(--r);
+  overflow:hidden;transition:border-color .2s;
+}
+.card:hover{border-color:#2E3556}
+.card.hit{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
+.card-top{display:flex;align-items:flex-start;gap:14px;padding:13px 15px}
+.card-top .name{
+  font-family:var(--font-display);font-size:13.5px;color:var(--accent);
+  white-space:nowrap;padding-top:1px;
+}
+.card-top .desc{color:var(--mist);font-size:13.5px;flex:1;min-width:0}
+.card-top .desc b{color:var(--bone);font-weight:600}
+.card-top .desc code{
+  font-family:var(--font-display);font-size:12px;background:#0B0D18;
+  border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--bone);
+}
+.card-actions{display:flex;gap:6px;flex-shrink:0}
+.mini{
+  font-family:var(--font-display);font-size:10.5px;letter-spacing:.06em;
+  background:#0B0D18;border:1px solid var(--line);color:var(--mist);
+  border-radius:6px;padding:4px 8px;cursor:pointer;
+}
+.mini:hover{color:var(--accent);border-color:var(--accent)}
+.mini.done{color:var(--jade);border-color:var(--jade)}
+
+pre.code{
+  margin:0;padding:13px 15px;background:#0B0D18;border-top:1px solid var(--line);
+  font-family:var(--font-display);font-size:12.6px;line-height:1.65;
+  overflow-x:auto;white-space:pre;tab-size:2;
+}
+pre.code::-webkit-scrollbar{height:8px}
+pre.code::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+
+/* syntax */
+.t-tag{color:var(--ember)}
+.t-attr{color:var(--citrine)}
+.t-str{color:var(--jade)}
+.t-com{color:#5B6288;font-style:italic}
+.t-kw{color:var(--periwinkle)}
+.t-num{color:#FF9E64}
+.t-fn{color:#7EE8FA}
+.t-sel{color:var(--citrine)}
+.t-prop{color:var(--periwinkle)}
+.t-punc{color:#6F779E}
+
+/* live lab */
+.lab{border-top:1px solid var(--line);display:none;grid-template-columns:1fr 1fr}
+.lab.open{display:grid}
+.lab textarea{
+  border:0;border-right:1px solid var(--line);background:#0B0D18;color:var(--bone);
+  font-family:var(--font-display);font-size:12.4px;line-height:1.6;padding:12px 14px;
+  resize:vertical;min-height:190px;tab-size:2;
+}
+.lab textarea:focus{outline:none;background:#0D0F1C}
+.lab .out{background:#fff;min-height:190px}
+.lab .out iframe{width:100%;height:100%;min-height:190px;border:0;display:block}
+.lab-bar{
+  grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;
+  padding:7px 12px;border-top:1px solid var(--line);background:#0D0F1C;
+  font-family:var(--font-display);font-size:10.5px;color:var(--mist);letter-spacing:.06em;
+}
+
+/* comparison do/avoid */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.vs > div{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--slab)}
+.vs .lbl{
+  font-family:var(--font-display);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  padding:9px 14px;display:flex;gap:8px;align-items:center;
+}
+.vs .bad .lbl{color:var(--rose);background:#FF5C7A12;border-bottom:1px solid #FF5C7A33}
+.vs .good .lbl{color:var(--jade);background:#38D9A912;border-bottom:1px solid #38D9A933}
+.vs pre.code{border-top:0}
+
+/* callout */
+.callout{
+  border:1px solid var(--line);border-left:3px solid var(--accent);
+  background:var(--slab);border-radius:0 var(--r) var(--r) 0;
+  padding:12px 16px;font-size:13.8px;color:var(--mist);margin-bottom:14px;
+}
+.callout b{color:var(--bone)}
+.callout code{font-family:var(--font-display);font-size:12px;color:var(--accent)}
+
+/* ============================================================
+   WIDGETS
+   ============================================================ */
+.widget{background:var(--slab);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.widget h4{
+  font-family:var(--font-display);font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent);margin:0 0 4px;
+}
+.widget .sub{color:var(--mist);font-size:13px;margin:0 0 14px}
+.widget input[type=text]{
+  width:100%;padding:10px 12px;background:#0B0D18;border:1px solid var(--line);
+  border-radius:8px;color:var(--bone);font-family:var(--font-display);font-size:13.5px;
+}
+.widget input[type=text]:focus{outline:none;border-color:var(--accent)}
+.widget label{
+  font-family:var(--font-display);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--mist);display:block;margin-bottom:5px;
+}
+.widget select,.widget input[type=range]{width:100%}
+.widget select{
+  padding:7px 9px;background:#0B0D18;border:1px solid var(--line);border-radius:7px;
+  color:var(--bone);font-family:var(--font-display);font-size:12.5px;
+}
+.widget input[type=range]{accent-color:var(--accent)}
+.ctrl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
+
+/* specificity */
+.spec-score{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.spec-cell{
+  flex:1;min-width:96px;text-align:center;background:#0B0D18;border:1px solid var(--line);
+  border-radius:8px;padding:12px 8px;
+}
+.spec-cell .v{font-family:var(--font-display);font-size:30px;font-weight:700;line-height:1}
+.spec-cell .k{font-family:var(--font-display);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mist);margin-top:6px}
+.spec-cell.i .v{color:var(--rose)}
+.spec-cell.c .v{color:var(--citrine)}
+.spec-cell.e .v{color:var(--jade)}
+.spec-verdict{font-family:var(--font-display);font-size:12.5px;color:var(--mist);margin-top:12px}
+.spec-verdict b{color:var(--bone)}
+
+/* box model */
+.bm{background:#0B0D18;border:1px solid var(--line);border-radius:8px;padding:18px;text-align:center}
+.bm .m{background:#FF6B3D26;border:1px dashed #FF6B3D88;padding:var(--mg);transition:padding .18s}
+.bm .b{background:#6E8CFF26;border:var(--bd) solid #6E8CFF;transition:border-width .18s}
+.bm .p{background:#FFC94026;border:1px dashed #FFC94088;padding:var(--pd);transition:padding .18s}
+.bm .c{background:#38D9A930;border:1px solid #38D9A9;padding:14px;font-family:var(--font-display);font-size:12px;color:var(--jade)}
+.bm-legend{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:14px;font-family:var(--font-display);font-size:11px}
+.bm-legend span{display:flex;align-items:center;gap:6px;color:var(--mist)}
+.bm-legend i{width:10px;height:10px;border-radius:3px;display:block}
+
+/* flex / grid playground */
+.play{background:#0B0D18;border:1px solid var(--line);border-radius:8px;padding:14px;min-height:180px;display:flex}
+.play.g{display:grid}
+.play .item{
+  background:linear-gradient(135deg,#6E8CFF44,#6E8CFF18);border:1px solid #6E8CFF77;
+  border-radius:7px;padding:16px 20px;font-family:var(--font-display);font-size:13px;color:#BFCCFF;
+  display:flex;align-items:center;justify-content:center;
+}
+.readout{
+  margin-top:12px;background:#0B0D18;border:1px solid var(--line);border-radius:8px;
+  padding:11px 13px;font-family:var(--font-display);font-size:12.4px;overflow-x:auto;white-space:pre;
+}
+
+/* footer */
+footer{
+  border-top:1px solid var(--line);margin-top:70px;padding:30px 0;
+  font-family:var(--font-display);font-size:11.5px;color:var(--mist);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+
+.empty{
+  text-align:center;padding:70px 20px;color:var(--mist);font-family:var(--font-display);font-size:13px;
+}
+[hidden]{display:none !important}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:1080px){
+  .hero{grid-template-columns:1fr;gap:32px}
+  .stage{height:250px}
+}
+@media (max-width:860px){
+  .shell{grid-template-columns:1fr}
+  .rail{display:none}
+  main{padding:0 18px 100px}
+  .lab{grid-template-columns:1fr}
+  .lab textarea{border-right:0;border-bottom:1px solid var(--line)}
+  .vs{grid-template-columns:1fr}
+  .topbar{flex-wrap:wrap}
+  .topbar .count{display:none}
+  .card-top{flex-wrap:wrap}
+  .layer-head .num{font-size:44px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important;transition:none !important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><span class="dots"><i></i><i></i><i></i></span> THREE&nbsp;LAYERS</div>
+  <div class="search" role="search">
+    <span class="mag">⌕</span>
+    <input id="q" type="search" placeholder="Search every tag, property, and method…" aria-label="Search the cheat sheet" autocomplete="off">
+    <kbd>/</kbd>
+  </div>
+  <div class="count" id="count"></div>
+</header>
+
+<div class="shell">
+  <nav class="rail" id="rail" aria-label="Sections"></nav>
+
+  <main>
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Every web page ever built</p>
+        <h1>
+          <span class="a">STRUCTURE.</span>
+          <span class="b">STYLE.</span>
+          <span class="c">BEHAVIOR.</span>
+        </h1>
+        <p class="lede">Three languages, stacked on top of each other. Turn one off and watch what breaks — that's the fastest way to learn what each one actually does.</p>
+        <div class="cta">
+          <a class="btn solid" href="#html">Start with HTML</a>
+          <a class="btn" href="#craft">Formatting rules</a>
+        </div>
+      </div>
+
+      <div class="stagewrap">
+        <div class="stage" id="stage">
+          <button class="plate p1" id="plate-html" aria-pressed="true" aria-label="Toggle the HTML layer">
+            <span class="grid-lines"></span><span class="glyph">&lt;/&gt;</span><span class="tag">HTML</span>
+          </button>
+          <button class="plate p2" id="plate-css" aria-pressed="true" aria-label="Toggle the CSS layer">
+            <span class="grid-lines"></span><span class="glyph">{ }</span><span class="tag">CSS</span>
+          </button>
+          <button class="plate p3" id="plate-js" aria-pressed="true" aria-label="Toggle the JavaScript layer">
+            <span class="grid-lines"></span><span class="glyph">( )</span><span class="tag">JS</span>
+          </button>
+        </div>
+        <div class="toggles">
+          <button class="t-html" data-layer="html" aria-pressed="true">HTML</button>
+          <button class="t-css" data-layer="css" aria-pressed="true">CSS</button>
+          <button class="t-js" data-layer="js" aria-pressed="true">JS</button>
+        </div>
+        <div class="stage-demo"><iframe id="stage-out" title="Live result of the enabled layers" sandbox="allow-scripts"></iframe></div>
+        <p class="stage-hint" id="stage-hint">All three on — click a plate to switch a layer off</p>
+      </div>
+    </section>
+
+    <div id="mount"></div>
+    <div class="empty" id="empty" hidden>Nothing matches that. Try a tag name, a property, or a method.</div>
+
+    <footer>
+      <span>THREE LAYERS · built for Adam · single file, no dependencies</span>
+      <span id="foot-count"></span>
+    </footer>
+  </main>
+</div>
+
+
+<script>
+/* ============================================================
+   SYNTAX HIGHLIGHTER — tiny, dependency-free, good enough
+   ============================================================ */
+const RULES = {
+  html: [
+    [/<!--[\s\S]*?-->/, 'com'],
+    [/"[^"]*"|'[^']*'/, 'str'],
+    [/<\/?[a-zA-Z][\w-]*|\/?>/, 'tag'],
+    [/[a-zA-Z-]+(?==)/, 'attr']
+  ],
+  css: [
+    [/\/\*[\s\S]*?\*\//, 'com'],
+    [/"[^"]*"|'[^']*'/, 'str'],
+    [/[-a-z]+(?=\s*:\s)/, 'prop'],
+    [/#[0-9a-fA-F]{3,8}\b/, 'num'],
+    [/@[\w-]+|::?[\w-]+(\([^)]*\))?|[.#][\w-]+/, 'sel'],
+    [/-?\d*\.?\d+(px|rem|em|%|vh|vw|s|ms|deg|fr|ch|ex|pt|vmin|vmax)?\b/, 'num']
+  ],
+  js: [
+    [/\/\/[^\n]*|\/\*[\s\S]*?\*\//, 'com'],
+    [/"[^"]*"|'[^']*'|`[^`]*`/, 'str'],
+    [/\b(const|let|var|function|return|if|else|for|of|in|while|class|extends|new|async|await|try|catch|finally|throw|import|export|from|default|typeof|instanceof|delete|switch|case|break|continue|do|null|undefined|true|false|this|super|static|get|set)\b/, 'kw'],
+    [/[A-Za-z_$][\w$]*(?=\s*\()/, 'fn'],
+    [/\b\d+\.?\d*\b/, 'num']
+  ]
+};
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+function hl(src, lang) {
+  const rules = RULES[lang];
+  if (!rules) return esc(src);
+  const res = rules.map(r => new RegExp(r[0].source, 'g'));
+  let out = '', pos = 0;
+  while (pos < src.length) {
+    let best = null, bestCls = '', bestAt = Infinity;
+    for (let i = 0; i < res.length; i++) {
+      res[i].lastIndex = pos;
+      const m = res[i].exec(src);
+      if (m && m[0] && m.index < bestAt) { bestAt = m.index; best = m[0]; bestCls = rules[i][1]; }
+    }
+    if (!best) break;
+    out += esc(src.slice(pos, bestAt)) + '<span class="t-' + bestCls + '">' + esc(best) + '</span>';
+    pos = bestAt + best.length;
+  }
+  return out + esc(src.slice(pos));
+}
+
+/* ============================================================
+   SANDBOX — runs a snippet in an isolated iframe
+   ============================================================ */
+const CONSOLE_SHIM =
+  '<style>body{font:13px/1.55 ui-monospace,Menlo,Consolas,monospace;color:#111;margin:12px}' +
+  '#__out{margin:10px 0 0;padding:8px 10px;background:#0B0D18;color:#38D9A9;border-radius:8px;white-space:pre-wrap;font-size:12px}' +
+  '#__out:empty{display:none}#__out div{padding:1px 0;border-bottom:1px solid #ffffff12}</style>' +
+  '<script>(function(){var box;function ready(){box=document.getElementById("__out");' +
+  'if(!box){box=document.createElement("pre");box.id="__out";document.body.appendChild(box);}return box;}' +
+  'function fmt(v){try{return typeof v==="object"&&v!==null?JSON.stringify(v):String(v)}catch(e){return String(v)}}' +
+  'function p(){var l=document.createElement("div");l.textContent=[].map.call(arguments,fmt).join(" ");ready().appendChild(l)}' +
+  'console.log=p;console.info=p;console.warn=p;console.error=p;console.table=p;' +
+  'window.addEventListener("error",function(e){p("\\u26A0 "+e.message)});' +
+  'document.addEventListener("DOMContentLoaded",ready);})();<\/script>';
+
+function buildDoc(code, lang) {
+  if (lang === 'js') return CONSOLE_SHIM + '<body><script>try{\n' + code + '\n}catch(e){console.error(e.message)}<\/script>';
+  if (lang === 'css') return CONSOLE_SHIM + '<style>' + code + '</style>' +
+    '<div class="demo"><h3>Heading</h3><p>Some paragraph text to style.</p>' +
+    '<button>A button</button><ul><li>One</li><li>Two</li></ul></div>';
+  return CONSOLE_SHIM + code;
+}
+
+function runLab(card) {
+  const ta = card.querySelector('.lab textarea');
+  const frame = card.querySelector('.lab iframe');
+  frame.srcdoc = buildDoc(ta.value, ta.dataset.lang);
+}
+/* ============================================================
+   CONTENT
+   ============================================================ */
+const DATA = [];
+
+DATA.push({
+  id: 'html', label: 'HTML', num: '01', role: 'The structure layer',
+  accent: 'var(--ember)',
+  tagline: 'HTML says what things ARE. Not how they look, not what they do — what they are. Pick the tag that names the meaning and you get styling hooks, keyboard support, and screen-reader support for free.',
+  groups: [
+  {
+    id: 'skeleton', t: 'Document skeleton', note: 'Every page starts here. Type these five lines from memory until it is muscle memory.',
+    items: [
+      { n: 'Boilerplate', d: 'The minimum viable page. <b>lang</b> helps screen readers pronounce correctly, <b>viewport</b> makes mobile behave.', l: 'html', lab: 1, c:
+`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page title — shows in the tab</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Hello</h1>
+  <script src="app.js" defer><\/script>
+</body>
+</html>` },
+      { n: '<head> tags', d: 'Metadata the user never sees but browsers, search engines, and link previews all read.', l: 'html', c:
+`<meta name="description" content="One sentence, ~155 chars.">
+<meta name="theme-color" content="#08090F">
+<link rel="icon" href="/favicon.svg">
+<link rel="canonical" href="https://site.com/page">
+
+<!-- Social link previews -->
+<meta property="og:title" content="Three Layers">
+<meta property="og:description" content="A live cheat sheet.">
+<meta property="og:image" content="https://site.com/card.png">` },
+      { n: 'Script loading', d: 'Where and how you load JS changes when it runs. <b>defer</b> is the right default.', l: 'html', c:
+`<script src="a.js"><\/script>         <!-- blocks parsing. avoid in <head> -->
+<script src="a.js" defer><\/script>   <!-- downloads now, runs after HTML parses, in order -->
+<script src="a.js" async><\/script>   <!-- runs the moment it lands, order not guaranteed -->
+<script type="module" src="a.js"><\/script> <!-- deferred by default, allows import -->` }
+    ]
+  },
+  {
+    id: 'semantics', t: 'Semantic layout', note: 'These are landmarks. Screen readers let users jump straight to them, and you get self-documenting markup as a bonus.',
+    items: [
+      { n: 'Landmarks', d: 'The page-level skeleton. One <b>&lt;main&gt;</b> per page — it is the "skip to content" target.', l: 'html', lab: 1, c:
+`<body>
+  <header>       <!-- site branding, intro content -->
+    <nav>...</nav>            <!-- major navigation block -->
+  </header>
+
+  <main>         <!-- the unique content of THIS page. exactly one. -->
+    <article>    <!-- self-contained: a post, a card, a comment -->
+      <section>  <!-- a thematic chunk, normally with a heading -->
+      </section>
+    </article>
+    <aside>      <!-- tangential: sidebar, pull quote, related links -->
+    </aside>
+  </main>
+
+  <footer>...</footer>
+</body>` },
+      { vs: [
+        { label: 'Div soup', lang: 'html', code:
+`<div class="header">
+  <div class="nav">
+    <div class="link" onclick="go()">Home</div>
+  </div>
+</div>
+<div class="content">
+  <div class="title">Post</div>
+  <div class="text">...</div>
+</div>` },
+        { label: 'Semantic', lang: 'html', code:
+`<header>
+  <nav>
+    <a href="/">Home</a>
+  </nav>
+</header>
+<main>
+  <article>
+    <h1>Post</h1>
+    <p>...</p>
+  </article>
+</main>` }
+      ]},
+      { call: 'The div test: if you are about to write <code>&lt;div&gt;</code>, ask "is there a tag that names this?" A clickable thing is a <code>&lt;button&gt;</code>. A thing that navigates is an <code>&lt;a&gt;</code>. A <code>&lt;div&gt;</code> is what you use when the answer is genuinely "it is just a box."' },
+      { n: 'article vs section', d: 'Would it still make sense on its own, syndicated in an RSS feed? <b>article</b>. Is it a chunk of a bigger whole? <b>section</b>.', l: 'html', c:
+`<article>                     <!-- a blog post: stands alone -->
+  <h2>How CSS grid works</h2>
+  <section>                   <!-- chunk of that post -->
+    <h3>Defining tracks</h3>
+  </section>
+  <section>
+    <h3>Placing items</h3>
+  </section>
+</article>` },
+      { n: 'Heading order', d: 'Headings form an outline. Never skip levels for visual size — that is what CSS is for.', l: 'html', c:
+`<h1>One per page — the page's actual subject</h1>
+  <h2>Major part</h2>
+    <h3>Sub-part</h3>
+  <h2>Next major part</h2>
+
+<!-- Wrong: skipping h2 to get smaller text -->
+<h1>Title</h1>
+<h4>Subtitle</h4>       <!-- use <p class="subtitle"> instead -->` }
+    ]
+  },
+  {
+    id: 'text', t: 'Text semantics', note: 'Inline tags that carry meaning. The italic/bold pairs look identical but mean different things to assistive tech.',
+    items: [
+      { n: 'Emphasis pairs', d: '<b>strong/em</b> carry meaning. <b>b/i</b> are purely visual offsets with no added importance.', l: 'html', lab: 1, c:
+`<strong>Serious importance</strong>   <!-- read with emphasis -->
+<em>Stress emphasis</em>             <!-- changes sentence meaning -->
+<b>Visually bold</b>                 <!-- keyword, no importance -->
+<i>Visually italic</i>               <!-- term, ship name, foreign phrase -->
+<mark>Highlighted for relevance</mark>
+<small>Fine print, legal, attribution</small>
+<del>Removed</del> <ins>Added</ins>` },
+      { n: 'Quotes & code', d: 'Structured text with real meaning attached.', l: 'html', lab: 1, c:
+`<blockquote cite="https://source.com">
+  <p>A block-level quotation.</p>
+  <footer>— <cite>Author, Work</cite></footer>
+</blockquote>
+
+<p>She said <q>inline quotation</q> and left.</p>
+<p>Run <code>npm install</code> in the terminal.</p>
+<pre><code>preformatted
+  whitespace preserved</code></pre>
+<p>Press <kbd>Ctrl</kbd> + <kbd>K</kbd>.</p>
+<p>Output was <samp>404 Not Found</samp>.</p>
+<p>Let <var>x</var> = 5.</p>` },
+      { n: 'Time & abbreviations', d: 'Machine-readable dates and expandable acronyms.', l: 'html', c:
+`<time datetime="2026-08-18">August 18th</time>
+<time datetime="2026-08-18T14:30">2:30pm today</time>
+<time datetime="PT2H30M">two and a half hours</time>
+
+<abbr title="Cascading Style Sheets">CSS</abbr>
+<address>Contact: <a href="mailto:me@site.com">me@site.com</a></address>` },
+      { n: 'Line breaks & rules', d: 'Use sparingly — these are content, not spacing tools. Spacing is CSS margin.', l: 'html', c:
+`<p>Address line one<br>Address line two</p>   <!-- meaningful break -->
+<hr>                                          <!-- thematic shift in content -->
+<p>Long&nbsp;word stays together</p>           <!-- non-breaking space -->
+<wbr>                                          <!-- optional break opportunity -->` },
+      { n: 'Entities', d: 'Characters that would otherwise break your markup, or that are hard to type.', l: 'html', c:
+`&lt;  &gt;  &amp;      <!-- < > & — required escapes -->
+&quot;  &apos;      <!-- " ' -->
+&nbsp;              <!-- non-breaking space -->
+&copy; &reg; &trade;
+&mdash; &ndash; &hellip;
+&times; &divide; &deg;
+&#8594;             <!-- any codepoint: → -->` }
+    ]
+  },
+  {
+    id: 'lists', t: 'Lists', note: 'Three kinds, and they are not interchangeable. Order matters or it does not; description lists pair terms with values.',
+    items: [
+      { n: 'ul / ol / dl', d: 'Only <b>&lt;li&gt;</b> may be a direct child of a list. Nest a full list inside an <b>&lt;li&gt;</b>, not beside it.', l: 'html', lab: 1, c:
+`<ul>
+  <li>Order does not matter</li>
+  <li>Nesting:
+    <ul><li>goes inside the li</li></ul>
+  </li>
+</ul>
+
+<ol start="3" reversed type="a">
+  <li>Order carries meaning</li>
+</ol>
+
+<dl>
+  <dt>Term</dt>
+  <dd>Its description</dd>
+  <dt>Another term</dt>
+  <dd>Can have multiple dd</dd>
+</dl>` },
+      { n: 'Nav lists', d: 'A menu is a list of links. Marking it up as one tells screen readers how many items there are.', l: 'html', c:
+`<nav aria-label="Main">
+  <ul>
+    <li><a href="/">Home</a></li>
+    <li><a href="/docs" aria-current="page">Docs</a></li>
+  </ul>
+</nav>` }
+    ]
+  },
+  {
+    id: 'links', t: 'Links & media', note: 'Links navigate. Buttons act. Confusing the two is the single most common accessibility bug on the web.',
+    items: [
+      { n: 'Anchors', d: 'Link text should make sense read alone — "click here" tells a screen-reader user nothing.', l: 'html', c:
+`<a href="/about">Internal page</a>
+<a href="#section-id">Jump on this page</a>
+<a href="https://x.com" target="_blank" rel="noopener noreferrer">New tab</a>
+<a href="mailto:me@site.com?subject=Hi">Email</a>
+<a href="tel:+14175550100">Call</a>
+<a href="/report.pdf" download="q3.pdf">Download</a>` },
+      { call: '<b>target="_blank" needs rel="noopener".</b> Without it, the new page can reach back through <code>window.opener</code> and redirect yours. Modern browsers mostly default to this now — set it anyway.' },
+      { n: 'Images', d: '<b>alt</b> is required. Describe the meaning; use <code>alt=""</code> for purely decorative images so screen readers skip them.', l: 'html', c:
+`<img src="cat.jpg" alt="A tabby asleep on a keyboard"
+     width="800" height="600" loading="lazy" decoding="async">
+
+<!-- decorative only: empty alt, not missing alt -->
+<img src="swirl.svg" alt="">
+
+<figure>
+  <img src="chart.png" alt="Sales doubled in Q3">
+  <figcaption>Q3 revenue, year over year</figcaption>
+</figure>` },
+      { n: 'Responsive images', d: 'Let the browser pick the file. <b>srcset</b> for resolution, <b>&lt;picture&gt;</b> for art direction or format fallbacks.', l: 'html', c:
+`<img src="p-800.jpg"
+     srcset="p-400.jpg 400w, p-800.jpg 800w, p-1600.jpg 1600w"
+     sizes="(max-width: 600px) 100vw, 50vw"
+     alt="Description">
+
+<picture>
+  <source srcset="hero.avif" type="image/avif">
+  <source srcset="hero.webp" type="image/webp">
+  <img src="hero.jpg" alt="Description">
+</picture>` },
+      { n: 'Audio, video, iframe', d: 'Always ship <b>controls</b> unless you are building your own. Autoplay only works when muted.', l: 'html', c:
+`<video src="clip.mp4" controls muted playsinline
+       poster="thumb.jpg" width="640">
+  <track kind="captions" src="cc.vtt" srclang="en" label="English" default>
+  Your browser cannot play this video.
+</video>
+
+<audio src="song.mp3" controls loop preload="metadata"></audio>
+
+<iframe src="https://example.com" title="Required for a11y"
+        loading="lazy" sandbox="allow-scripts"></iframe>` }
+    ]
+  },
+  {
+    id: 'tables', t: 'Tables', note: 'For tabular data only — never for layout. A correct table is genuinely accessible; a fake one is a maze.',
+    items: [
+      { n: 'Full anatomy', d: '<b>scope</b> is what links a header to its row or column for screen readers.', l: 'html', lab: 1, c:
+`<table>
+  <caption>Q3 sales by region</caption>
+  <thead>
+    <tr>
+      <th scope="col">Region</th>
+      <th scope="col">Units</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">West</th>
+      <td>1,204</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr><th scope="row">Total</th><td>1,204</td></tr>
+  </tfoot>
+</table>` },
+      { n: 'Spanning & columns', d: 'Merge cells with span attributes; style whole columns with <b>&lt;colgroup&gt;</b>.', l: 'html', c:
+`<colgroup>
+  <col style="width:40%">
+  <col span="2" style="background:#f5f5f5">
+</colgroup>
+
+<td colspan="2">Spans two columns</td>
+<td rowspan="3">Spans three rows</td>` }
+    ]
+  },
+  {
+    id: 'forms', t: 'Forms & inputs', note: 'The browser gives you validation, keyboards, autofill, and date pickers for free — if you use the right type and a real label.',
+    items: [
+      { n: 'Anatomy', d: 'The <b>label</b> must point at the input <b>id</b>. Clicking the label then focuses the field — and screen readers announce it.', l: 'html', lab: 1, c:
+`<form action="/submit" method="post">
+  <fieldset>
+    <legend>Your details</legend>
+
+    <label for="email">Email address</label>
+    <input type="email" id="email" name="email"
+           required autocomplete="email"
+           placeholder="you@example.com">
+
+    <label for="msg">Message</label>
+    <textarea id="msg" name="msg" rows="4"></textarea>
+
+    <button type="submit">Send message</button>
+    <button type="button">Cancel</button>
+  </fieldset>
+</form>` },
+      { n: 'Input types', d: 'Each one changes the mobile keyboard, the validation, and sometimes the whole UI widget.', l: 'html', lab: 1, c:
+`<input type="text">      <input type="email">
+<input type="password">  <input type="number" min="0" max="10" step="1">
+<input type="tel">       <input type="url">
+<input type="search">    <input type="date">
+<input type="time">      <input type="datetime-local">
+<input type="month">     <input type="week">
+<input type="color">     <input type="range" min="0" max="100">
+<input type="file" accept="image/*" multiple>
+<input type="checkbox">  <input type="radio" name="group">
+<input type="hidden" value="token">` },
+      { n: 'Validation attributes', d: 'Constraints the browser enforces before your JS ever runs. Style the states with <code>:valid</code> / <code>:invalid</code>.', l: 'html', c:
+`<input required
+       minlength="8" maxlength="64"
+       min="1" max="99" step="0.5"
+       pattern="[A-Z]{2}-\\d{4}"
+       title="Two letters, dash, four digits"
+       readonly disabled
+       autocomplete="current-password"
+       inputmode="numeric"
+       autofocus>` },
+      { n: 'Select & datalist', d: '<b>select</b> forces a choice from the list. <b>datalist</b> suggests but still allows free text.', l: 'html', lab: 1, c:
+`<select id="tier" name="tier">
+  <optgroup label="Paid">
+    <option value="pro" selected>Pro</option>
+    <option value="team">Team</option>
+  </optgroup>
+  <option value="free">Free</option>
+</select>
+
+<input list="cities" name="city">
+<datalist id="cities">
+  <option value="Springfield">
+  <option value="Branson">
+</datalist>` },
+      { call: 'Radio buttons only group if they share the same <code>name</code>. Checkboxes with the same name submit as an array. A <code>&lt;button&gt;</code> inside a form defaults to <code>type="submit"</code> — set <code>type="button"</code> or it will reload your page.' }
+    ]
+  },
+  {
+    id: 'interactive', t: 'Built-in interactive elements', note: 'Native widgets that need zero JavaScript. Accessible, keyboard-ready, and free.',
+    items: [
+      { n: 'details / summary', d: 'A real accordion with no script. Add <b>name</b> to make siblings mutually exclusive.', l: 'html', lab: 1, c:
+`<details name="faq">
+  <summary>What is a disclosure widget?</summary>
+  <p>This. It toggles on click, works with the keyboard,
+     and is announced correctly by screen readers.</p>
+</details>
+
+<details name="faq" open>
+  <summary>Can they be exclusive?</summary>
+  <p>Sharing a name makes them behave like an accordion.</p>
+</details>` },
+      { n: 'dialog', d: 'The native modal. <b>showModal()</b> traps focus, adds a backdrop, and closes on Escape automatically.', l: 'html', lab: 1, c:
+`<button id="open">Open dialog</button>
+
+<dialog id="dlg">
+  <h3>Confirm</h3>
+  <form method="dialog">
+    <button value="cancel">Cancel</button>
+    <button value="ok">OK</button>
+  </form>
+</dialog>
+
+<script>
+  open.onclick = () => dlg.showModal();
+  dlg.onclose = () => console.log('closed with:', dlg.returnValue);
+<\/script>` },
+      { n: 'progress / meter / output', d: '<b>progress</b> = task completion. <b>meter</b> = a value inside a known range.', l: 'html', lab: 1, c:
+`<progress value="70" max="100">70%</progress>
+<progress></progress>            <!-- indeterminate -->
+
+<meter value="0.8" min="0" max="1"
+       low="0.3" high="0.7" optimum="1">80%</meter>
+
+<output name="result" for="a b">42</output>` },
+      { n: 'template', d: 'Inert markup the browser parses but does not render — clone it in JS to stamp out repeated UI.', l: 'html', c:
+`<template id="row-tpl">
+  <li class="row"><span class="name"></span></li>
+</template>
+
+<script>
+  const node = row-tpl.content.cloneNode(true);
+  node.querySelector('.name').textContent = 'Adam';
+  list.append(node);
+<\/script>` }
+    ]
+  },
+  {
+    id: 'a11y', t: 'Accessibility essentials', note: 'The first rule of ARIA is: do not use ARIA. Native elements already carry the right role, state, and keyboard behavior.',
+    items: [
+      { vs: [
+        { label: 'Fake button', lang: 'html', code:
+`<div class="btn" onclick="save()">
+  Save
+</div>
+
+<!-- not focusable
+     no Enter/Space handling
+     no role announced
+     invisible to keyboard users -->` },
+        { label: 'Real button', lang: 'html', code:
+`<button type="button" onclick="save()">
+  Save
+</button>
+
+<!-- focusable, Enter + Space work,
+     announced as "Save, button",
+     disabled state built in -->` }
+      ]},
+      { n: 'ARIA you will actually use', d: 'Reach for these only when no native element fits.', l: 'html', c:
+`<button aria-expanded="false" aria-controls="menu">Menu</button>
+<nav aria-label="Breadcrumb">…</nav>
+<span aria-hidden="true">★</span>          <!-- hide decoration -->
+<button aria-label="Close"><span aria-hidden="true">×</span></button>
+<div role="alert">Saved.</div>             <!-- announced immediately -->
+<div aria-live="polite">3 results</div>    <!-- announced when idle -->
+<input aria-describedby="hint"> <p id="hint">8 characters minimum</p>
+<a href="#main" class="skip-link">Skip to content</a>` },
+      { n: 'Focus management', d: '<b>tabindex="0"</b> puts a custom element in tab order. <b>-1</b> makes it focusable by script only. Never use positive values.', l: 'html', c:
+`<div tabindex="0">Now reachable by Tab</div>
+<div tabindex="-1" id="panel">Focusable via panel.focus()</div>
+<div tabindex="3">Never do this — it wrecks tab order</div>
+
+<!-- keep focus rings visible -->
+<style>:focus-visible { outline: 2px solid #6E8CFF; outline-offset: 2px; }</style>` },
+      { call: 'Quick audit: unplug your mouse. If you cannot reach and operate every control with <code>Tab</code>, <code>Enter</code>, <code>Space</code>, and arrow keys, it is broken. That single test catches most real-world accessibility failures.' }
+    ]
+  }
+  ]
+});
+DATA.push({
+  id: 'css', label: 'CSS', num: '02', role: 'The style layer',
+  accent: 'var(--periwinkle)',
+  tagline: 'CSS answers "where does it go and what does it look like." It is a cascade: many rules apply at once, and specificity decides who wins. Learn the cascade and layout stops being guesswork.',
+  groups: [
+  {
+    id: 'apply', t: 'Getting CSS onto the page', note: 'Three ways in, and one of them is almost always the wrong one.',
+    items: [
+      { n: 'The three methods', d: 'External is the default. Inline styles beat almost everything in specificity, which is exactly why you avoid them.', l: 'html', c:
+`<!-- 1. External — cacheable, reusable, the default -->
+<link rel="stylesheet" href="style.css">
+
+<!-- 2. Internal — one-off pages, critical above-the-fold CSS -->
+<style> body { margin: 0; } </style>
+
+<!-- 3. Inline — highest specificity, hardest to override. avoid. -->
+<p style="color: red">…</p>` },
+      { n: 'Anatomy of a rule', d: 'Selector picks the elements, declarations set the values. Semicolon after every declaration.', l: 'css', c:
+`selector {
+  property: value;      /* one declaration */
+  color: #6E8CFF;
+}
+
+/* group selectors with commas */
+h1, h2, .title { font-weight: 700; }
+
+/* this is a comment — CSS has no // line comments */` }
+    ]
+  },
+  {
+    id: 'selectors', t: 'Selectors', note: 'How you target elements. Combinators and pseudo-classes are where the real power is.',
+    items: [
+      { n: 'Basics & combinators', d: 'Space means "any descendant". <b>&gt;</b> means "direct child only" — that distinction fixes a lot of bugs.', l: 'css', c:
+`*              { }   /* everything */
+p              { }   /* by tag */
+.card          { }   /* by class */
+#hero          { }   /* by id */
+[data-open]    { }   /* has the attribute */
+[type="email"] { }   /* attribute equals */
+[href^="https"]{ }   /* starts with */
+[href$=".pdf"] { }   /* ends with */
+[class*="btn"] { }   /* contains */
+
+.card p        { }   /* any p inside .card */
+.card > p      { }   /* p that is a DIRECT child */
+h2 + p         { }   /* the p immediately after an h2 */
+h2 ~ p         { }   /* every p after an h2, same parent */
+a.btn          { }   /* an a that ALSO has .btn */` },
+      { n: 'Pseudo-classes (state)', d: 'Single colon. They match elements based on state or position, not on markup you wrote.', l: 'css', c:
+`a:hover, a:focus, a:active, a:visited { }
+:focus-visible { }      /* only when keyboard-focused — use this one */
+button:disabled, input:checked { }
+input:valid, input:invalid, input:placeholder-shown { }
+
+li:first-child, li:last-child, li:only-child { }
+li:nth-child(2)     { }   /* the second */
+li:nth-child(odd)   { }   /* 1,3,5… */
+li:nth-child(3n+1)  { }   /* every third, offset by one */
+li:nth-last-child(2){ }   /* second from the end */
+p:not(.lead)        { }   /* everything except */
+:is(h1, h2, h3) a   { }   /* shorthand for a long list */
+:where(h1, h2) a    { }   /* same, but zero specificity */` },
+      { n: 'Pseudo-elements (parts)', d: 'Double colon. They style a piece of an element, or invent a new box entirely.', l: 'css', lab: 1, c:
+`.quote::before { content: "\\201C"; font-size: 3rem; }
+.quote::after  { content: ""; display: block; }
+
+p::first-line   { font-variant: small-caps; }
+p::first-letter { float: left; font-size: 3em; }
+::selection     { background: #FFC940; color: #000; }
+::placeholder   { color: #888; }
+::marker        { color: #FF6B3D; }     /* list bullets */
+::backdrop      { background: #000c; }  /* behind a modal */` },
+      { call: '<b>content</b> is mandatory on <code>::before</code> and <code>::after</code> — even if empty. Without it the pseudo-element does not exist. And they cannot be added to replaced elements like <code>&lt;img&gt;</code> or <code>&lt;input&gt;</code>.' }
+    ]
+  },
+  {
+    id: 'specificity', t: 'The cascade & specificity', note: 'When two rules collide, this is who wins. Play with it below — type any selector.',
+    items: [
+      { w: 'specificity' },
+      { n: 'The full order of battle', d: 'Checked top to bottom. Only if everything above ties does source order decide.', l: 'css', c:
+`/* 1. !important  — nuclear option, breaks the cascade */
+/* 2. Inline style="…"          → 1,0,0,0 */
+/* 3. IDs           #hero       → 0,1,0,0 */
+/* 4. Classes, attributes, pseudo-classes
+      .card [open] :hover       → 0,0,1,0 */
+/* 5. Elements, pseudo-elements
+      div ::before              → 0,0,0,1 */
+/* 6. Last rule in the file wins the tie */
+
+#nav .item a       /* 0,1,1,1 — beats… */
+.nav .item .link a /* 0,0,3,1 — …this, ids always outrank classes */` },
+      { n: 'Inheritance & resets', d: 'Some properties flow down to children. These four keywords control that explicitly.', l: 'css', c:
+`/* inherited by default: color, font-*, line-height,
+   text-align, visibility, cursor, letter-spacing        */
+/* NOT inherited: margin, padding, border, background,
+   width, height, display                               */
+
+.child {
+  color: inherit;   /* take the parent's value */
+  border: initial;  /* back to the spec default */
+  margin: unset;    /* inherit if inheritable, else initial */
+  padding: revert;  /* back to the browser's own stylesheet */
+}` },
+      { call: 'Chasing specificity with more selectors is a losing game. Keep everything at one class deep, and reach for <code>!important</code> only in throwaway utility classes you never intend to override.' }
+    ]
+  },
+  {
+    id: 'box', t: 'The box model', note: 'Every element is a box: content, padding, border, margin. Drag the sliders and watch it breathe.',
+    items: [
+      { w: 'boxmodel' },
+      { n: 'border-box, always', d: 'By default, <b>width</b> means the content box only — padding and border get added on top. This one line fixes that everywhere.', l: 'css', c:
+`*, *::before, *::after { box-sizing: border-box; }
+
+/* content-box (default): 200px + 40px padding + 4px border = 244px wide */
+/* border-box:            200px total, padding eats inward     */
+
+.box {
+  width: 200px;
+  padding: 20px;
+  border: 2px solid;
+}` },
+      { n: 'Margin shorthand & collapse', d: 'Vertical margins between siblings <b>collapse</b> into the larger of the two — they do not add up.', l: 'css', c:
+`margin: 10px;                /* all sides */
+margin: 10px 20px;           /* block | inline  (y | x) */
+margin: 10px 20px 30px;      /* top | x | bottom */
+margin: 10px 20px 30px 40px; /* top right bottom left — clockwise */
+margin-inline: auto;         /* horizontal centering, writing-mode aware */
+
+/* 30px between them, not 50px: */
+.a { margin-bottom: 30px; }
+.b { margin-top: 20px; }
+
+/* collapse is blocked by padding, border, flex, or grid */` },
+      { n: 'Sizing & overflow', d: 'Constraints beat fixed values. <b>min()</b>, <b>max()</b>, and <b>clamp()</b> replace most media queries.', l: 'css', c:
+`width: 100%; max-width: 65ch;      /* readable line length */
+min-height: 100vh;
+height: 100dvh;                    /* dynamic — handles mobile browser chrome */
+aspect-ratio: 16 / 9;
+width: clamp(320px, 90vw, 1200px); /* min, ideal, max */
+
+overflow: hidden | scroll | auto | clip;
+overflow-x: auto; overflow-y: hidden;
+text-overflow: ellipsis; white-space: nowrap;` }
+    ]
+  },
+  {
+    id: 'units', t: 'Units, colors & values', note: 'Pick the unit that expresses the relationship you actually mean.',
+    items: [
+      { n: 'Units', d: '<b>rem</b> for type and spacing, <b>%</b> or <b>fr</b> for layout, <b>px</b> for hairlines and radii.', l: 'css', c:
+`/* absolute */   px pt cm in
+/* relative to font */
+  1rem   /* the ROOT font size — usually 16px. your default. */
+  1em    /* THIS element's font size — compounds when nested */
+  1ch    /* width of "0" — great for input widths */
+  1ex    /* x-height */
+/* relative to viewport */
+  1vw 1vh          /* 1% of viewport width / height */
+  1svh 1lvh 1dvh   /* small / large / dynamic viewport height */
+  1vmin 1vmax
+/* layout */
+  1fr    /* one share of leftover grid space */
+  50%    /* of the PARENT's corresponding dimension */` },
+      { n: 'Colors', d: 'Six ways to say the same red. The <b>/ alpha</b> slash syntax works in every modern function.', l: 'css', lab: 1, c:
+`color: crimson;                    /* 148 named colors */
+color: #FF6B3D;                    /* hex */
+color: #FF6B3D80;                  /* hex + alpha */
+color: rgb(255 107 61 / 50%);      /* modern space-separated */
+color: hsl(15 100% 62% / .5);      /* hue saturation lightness — easiest to tweak */
+color: oklch(70% 0.19 40);         /* perceptually uniform, wide gamut */
+color: color-mix(in srgb, #FF6B3D 30%, transparent);
+color: currentColor;               /* whatever color: resolves to here */
+color: transparent;` },
+      { n: 'Gradients', d: 'Gradients are images, so they go in <b>background</b> — not <b>background-color</b>.', l: 'css', lab: 1, c:
+`background: linear-gradient(to right, #FF6B3D, #6E8CFF);
+background: linear-gradient(135deg, #FF6B3D 0%, #FFC940 60%, #6E8CFF 100%);
+background: radial-gradient(circle at 30% 20%, #6E8CFF, transparent 60%);
+background: conic-gradient(from 90deg, red, gold, red);
+background: repeating-linear-gradient(45deg, #222 0 10px, #333 10px 20px);` }
+    ]
+  },
+  {
+    id: 'typography', t: 'Typography', note: 'Type is most of what people actually see. These are the levers.',
+    items: [
+      { n: 'Core properties', d: 'A unitless <b>line-height</b> scales with the font size — always prefer it.', l: 'css', lab: 1, c:
+`font-family: "Inter", system-ui, sans-serif;  /* always end with a generic */
+font-size: 1.125rem;
+font-weight: 400 | 700 | 100–900;
+font-style: italic;
+line-height: 1.6;              /* unitless: multiplies the font size */
+letter-spacing: -0.02em;       /* tighten big headings */
+word-spacing: .1em;
+text-align: left | center | justify;
+text-transform: uppercase | capitalize | lowercase;
+text-decoration: underline wavy #FF6B3D 2px;
+text-underline-offset: 3px;
+text-wrap: balance;            /* even headline line lengths */
+text-wrap: pretty;             /* kills orphans in body copy */` },
+      { n: 'Fluid type', d: 'One line that scales smoothly between two breakpoints, with no media query.', l: 'css', c:
+`h1 { font-size: clamp(2rem, 5vw + 1rem, 4.5rem); }
+/*              min    preferred        max        */
+
+/* a whole scale from one variable */
+:root { --step: 1.25; }
+h3 { font-size: calc(1rem * var(--step)); }
+h2 { font-size: calc(1rem * var(--step) * var(--step)); }` },
+      { n: 'Custom fonts', d: '<b>font-display: swap</b> shows fallback text immediately instead of leaving a blank gap.', l: 'css', c:
+`@font-face {
+  font-family: "Mine";
+  src: url("mine.woff2") format("woff2");
+  font-weight: 100 900;      /* variable font range */
+  font-display: swap;
+}` }
+    ]
+  },
+  {
+    id: 'flex', t: 'Flexbox', note: 'One-dimensional layout: a row or a column. Reach for it for toolbars, nav bars, and card innards.',
+    items: [
+      { w: 'flexbox' },
+      { n: 'Container properties', d: 'Set on the parent. <b>justify-content</b> works along the main axis, <b>align-items</b> across it.', l: 'css', c:
+`.parent {
+  display: flex;
+  flex-direction: row | row-reverse | column | column-reverse;
+  flex-wrap: nowrap | wrap;
+  gap: 16px;                /* replaces margin hacks entirely */
+
+  justify-content: flex-start | center | space-between | space-around | space-evenly;
+  align-items: stretch | center | flex-start | flex-end | baseline;
+  align-content: center;    /* only matters with multiple wrapped lines */
+}` },
+      { n: 'Item properties', d: '<b>flex: 1</b> is the workhorse — grow to fill, shrink if needed, ignore my base size.', l: 'css', c:
+`.child {
+  flex: 1;                  /* = flex: 1 1 0%  — equal columns */
+  flex: 0 0 auto;           /* do not grow or shrink — fixed */
+  flex: 1 1 250px;          /* grow shrink basis */
+
+  flex-grow: 2;             /* takes twice the leftover space */
+  flex-shrink: 0;           /* never squash this one */
+  flex-basis: 200px;        /* starting size before grow/shrink */
+  align-self: center;       /* override align-items for just me */
+  order: -1;                /* visual reorder — does NOT change tab order */
+}` },
+      { call: 'The two-line centering trick: <code>display:flex; align-items:center; justify-content:center;</code> on the parent. Or the one-liner: <code>display:grid; place-items:center;</code>' }
+    ]
+  },
+  {
+    id: 'grid', t: 'CSS Grid', note: 'Two-dimensional layout: rows AND columns at once. Page layouts, dashboards, galleries.',
+    items: [
+      { w: 'grid' },
+      { n: 'Defining tracks', d: '<b>fr</b> is a share of the leftover space. <b>minmax</b> plus <b>auto-fit</b> gives you a responsive grid with no media queries at all.', l: 'css', c:
+`.grid {
+  display: grid;
+  grid-template-columns: 200px 1fr 200px;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));  /* magic */
+  grid-template-rows: auto 1fr auto;
+  gap: 20px;                /* row-gap column-gap */
+  grid-auto-flow: row | column | dense;
+  grid-auto-rows: minmax(120px, auto);   /* size of implicit rows */
+}` },
+      { n: 'Placing items', d: 'Count grid <b>lines</b>, not tracks. A 3-column grid has 4 lines.', l: 'css', c:
+`.item {
+  grid-column: 1 / 3;       /* from line 1 to line 3 */
+  grid-column: span 2;      /* however wide, just take two */
+  grid-column: 1 / -1;      /* full width, whatever the count */
+  grid-row: 2 / 4;
+  place-self: center;       /* align-self + justify-self */
+}` },
+      { n: 'Named areas', d: 'Draw the layout as ASCII art. It is the most readable layout syntax CSS has ever had.', l: 'css', lab: 1, c:
+`.page {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "sidebar header"
+    "sidebar main"
+    "sidebar footer";
+  min-height: 100vh;
+}
+.page > header  { grid-area: header; }
+.page > nav     { grid-area: sidebar; }
+.page > main    { grid-area: main; }
+.page > footer  { grid-area: footer; }` }
+    ]
+  },
+  {
+    id: 'position', t: 'Position & layering', note: 'How to take an element out of the normal flow — and how to put it back.',
+    items: [
+      { n: 'position values', d: '<b>absolute</b> anchors to the nearest positioned ancestor, so give that ancestor <code>position: relative</code>.', l: 'css', c:
+`position: static;    /* the default — in normal flow, top/left ignored */
+position: relative;  /* nudged from its spot, still occupies space.
+                        also becomes the anchor for absolute children */
+position: absolute;  /* removed from flow, anchored to nearest
+                        positioned ancestor */
+position: fixed;     /* anchored to the viewport, ignores scrolling */
+position: sticky;    /* relative until it hits the offset, then fixed */
+
+.header { position: sticky; top: 0; z-index: 10; }
+.badge  { position: absolute; inset: 0 0 auto auto; }  /* top-right */
+.cover  { position: absolute; inset: 0; }              /* fill parent */` },
+      { n: 'z-index & stacking', d: '<b>z-index</b> only works on positioned elements — and only against siblings in the same stacking context.', l: 'css', c:
+`.modal { position: fixed; z-index: 100; }
+
+/* these silently create a NEW stacking context, trapping
+   children's z-index inside it: */
+opacity: 0.99;
+transform: translateZ(0);
+filter: blur(0);
+will-change: transform;
+isolation: isolate;        /* the deliberate way to do it */` },
+      { n: 'display', d: 'The single most important layout property. <b>none</b> removes the element entirely — including from screen readers.', l: 'css', c:
+`display: block | inline | inline-block | flex | grid | none;
+display: inline-flex | inline-grid;
+display: contents;   /* the box vanishes, children join the parent's layout */
+
+/* hidden but still announced and focusable — use for skip links */
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}` }
+    ]
+  },
+  {
+    id: 'decoration', t: 'Borders, shadows & effects', note: 'The visual polish layer.',
+    items: [
+      { n: 'Borders & radius', d: 'Radius takes two values per corner to make ellipses.', l: 'css', lab: 1, c:
+`border: 2px solid #6E8CFF;
+border-style: solid | dashed | dotted | double | none;
+border-block-end: 1px solid;      /* logical: bottom in LTR */
+border-radius: 12px;
+border-radius: 50%;               /* circle, if square */
+border-radius: 12px 4px;          /* TL+BR / TR+BL */
+border-radius: 50% / 20%;         /* horizontal / vertical radii */
+outline: 2px solid;               /* drawn outside, no layout shift */
+outline-offset: 3px;` },
+      { n: 'Shadows & filters', d: '<b>box-shadow</b> follows the box; <b>drop-shadow</b> follows the actual shape, including PNG transparency.', l: 'css', lab: 1, c:
+`box-shadow: 0 4px 12px rgb(0 0 0 / .3);
+box-shadow: inset 0 2px 4px #0006;
+box-shadow: 0 1px 2px #0002, 0 8px 24px #0003;   /* layer for realism */
+text-shadow: 0 2px 8px #000;
+
+filter: blur(4px) brightness(1.2) saturate(1.4) grayscale(1);
+filter: drop-shadow(0 4px 8px #0006);            /* respects alpha shape */
+backdrop-filter: blur(14px);                     /* frosted glass */
+opacity: .6;
+mix-blend-mode: multiply | screen | overlay;` },
+      { n: 'Transforms', d: 'Transforms never affect layout — nothing else moves. That makes them cheap to animate.', l: 'css', lab: 1, c:
+`transform: translate(10px, 20px) | translateX(-50%) | translateY(2rem);
+transform: scale(1.05) | rotate(45deg) | skew(10deg);
+transform: rotate3d(1, 1, 0, 45deg) translateZ(50px);
+transform-origin: top left | 50% 100%;
+perspective: 800px;              /* on the PARENT, for 3D depth */
+transform-style: preserve-3d;` }
+    ]
+  },
+  {
+    id: 'motion', t: 'Transitions & animation', note: 'Transition = A to B on a trigger. Animation = a scripted sequence that can loop.',
+    items: [
+      { n: 'transition', d: 'Only animate <b>transform</b> and <b>opacity</b> when you can — the others force the browser to re-do layout.', l: 'css', lab: 1, c:
+`.btn {
+  transition: transform .2s ease, background-color .2s;
+  transition: all .3s cubic-bezier(.2, .8, .2, 1);
+  /*          property duration timing delay */
+}
+.btn:hover { transform: translateY(-2px); }
+
+/* ease | linear | ease-in | ease-out | ease-in-out
+   cubic-bezier(x1,y1,x2,y2) | steps(4, end)        */` },
+      { n: '@keyframes', d: 'Name a sequence, then attach it. <b>forwards</b> makes the final frame stick.', l: 'css', lab: 1, c:
+`@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.08); }
+}
+
+.card {
+  animation: rise .5s ease-out .1s both;
+  /*         name dur  timing delay fill */
+  animation: pulse 2s infinite;
+  animation-play-state: paused;
+}` },
+      { n: 'Respect reduced motion', d: 'Some people get physically ill from parallax and big movement. This is not optional.', l: 'css', c:
+`@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}` }
+    ]
+  },
+  {
+    id: 'vars', t: 'Custom properties & responsive', note: 'Real variables that live in the browser, respond to media queries, and can be changed from JavaScript.',
+    items: [
+      { n: 'Custom properties', d: 'They inherit, so redefining one on a subtree re-themes everything inside it.', l: 'css', lab: 1, c:
+`:root {
+  --brand: #6E8CFF;
+  --space: 8px;
+  --radius: 10px;
+}
+.card {
+  background: var(--brand);
+  padding: calc(var(--space) * 2);
+  border-radius: var(--radius, 4px);   /* fallback if unset */
+}
+.card.dark { --brand: #08090F; }       /* re-theme this subtree only */
+
+/* read + write from JS:
+   getComputedStyle(el).getPropertyValue('--brand')
+   el.style.setProperty('--brand', '#FF6B3D')          */` },
+      { n: 'Media queries', d: 'Design mobile-first: write the small layout as the base, then add <b>min-width</b> queries on top.', l: 'css', c:
+`@media (min-width: 768px)  { }        /* tablet and up */
+@media (max-width: 767px)  { }        /* phone only */
+@media (min-width: 40rem) and (max-width: 60rem) { }
+@media (orientation: landscape) { }
+@media (prefers-color-scheme: dark) { }
+@media (prefers-reduced-motion: reduce) { }
+@media (hover: hover) { .card:hover { } }   /* skip on touch */
+@media print { nav, .no-print { display: none; } }` },
+      { n: 'Container queries', d: 'Respond to the <b>parent\'s</b> width instead of the viewport. Truly reusable components.', l: 'css', c:
+`.sidebar { container-type: inline-size; container-name: panel; }
+
+@container panel (min-width: 400px) {
+  .card { display: grid; grid-template-columns: 100px 1fr; }
+}
+
+.title { font-size: 5cqi; }   /* 5% of the container's inline size */` }
+    ]
+  },
+  {
+    id: 'modern-css', t: 'Modern CSS worth knowing', note: 'Things that used to need JavaScript and now do not.',
+    items: [
+      { n: ':has() — the parent selector', d: 'Style an element based on what it contains. Twenty years of wishing, finally shipped.', l: 'css', lab: 1, c:
+`.card:has(img)          { padding: 0; }
+label:has(input:checked){ font-weight: 700; }
+form:has(:invalid) button { opacity: .5; }
+body:has(dialog[open])  { overflow: hidden; }
+.grid:has(> :nth-child(4)) { grid-template-columns: repeat(2, 1fr); }` },
+      { n: 'Nesting', d: 'Native nesting, no preprocessor. <b>&amp;</b> is the parent reference.', l: 'css', c:
+`.card {
+  padding: 16px;
+
+  & .title { font-weight: 700; }
+
+  &:hover { border-color: #6E8CFF; }
+
+  &.is-active { background: #101322; }
+
+  @media (min-width: 700px) { padding: 24px; }
+}` },
+      { n: 'Cascade layers & scroll', d: '<b>@layer</b> lets you set priority explicitly instead of fighting specificity.', l: 'css', c:
+`@layer reset, base, components, utilities;  /* later layers win */
+@layer components { .btn { padding: 8px; } }
+
+scroll-behavior: smooth;
+scroll-snap-type: x mandatory;   /* on the scroller */
+scroll-snap-align: center;       /* on each child */
+scroll-margin-top: 80px;         /* offset for a sticky header */
+overscroll-behavior: contain;    /* stop scroll chaining */
+accent-color: #6E8CFF;           /* recolors native checkboxes */
+color-scheme: dark light;        /* native form controls follow suit */` }
+    ]
+  }
+  ]
+});
+DATA.push({
+  id: 'js', label: 'JavaScript', num: '03', role: 'The behavior layer',
+  accent: 'var(--citrine)',
+  tagline: 'JavaScript makes the page respond. It reads and rewrites the DOM, listens for what people do, and talks to servers. Every snippet below is runnable — hit Run and the output prints underneath.',
+  groups: [
+  {
+    id: 'vars', t: 'Variables & types', note: 'Two declarations you use and one you do not. Seven primitive types plus objects.',
+    items: [
+      { n: 'const / let / var', d: '<b>const</b> by default, <b>let</b> when it must be reassigned, <b>var</b> never.', l: 'js', lab: 1, c:
+`const name = 'Adam';     // cannot be reassigned
+let count = 0;           // reassignable
+count += 1;
+
+// const objects are still MUTABLE — the binding is fixed, not the contents
+const user = { role: 'admin' };
+user.role = 'owner';     // fine
+// user = {};            // TypeError
+
+var old = 'function-scoped, hoisted, avoid';
+console.log(name, count, user);` },
+      { n: 'Types & checking', d: '<b>typeof null</b> returns "object". It is a 30-year-old bug that can never be fixed.', l: 'js', lab: 1, c:
+`typeof 'hi'        // 'string'
+typeof 42          // 'number'
+typeof 9007199254740993n  // 'bigint'
+typeof true        // 'boolean'
+typeof undefined   // 'undefined'
+typeof Symbol()    // 'symbol'
+typeof null        // 'object'  <- the famous bug
+typeof []          // 'object'
+typeof function(){}// 'function'
+
+console.log(Array.isArray([]));            // true — the right array check
+console.log(Number.isInteger(4.0));        // true
+console.log(Object.prototype.toString.call([])); // '[object Array]'` },
+      { n: 'Truthy & falsy', d: 'Exactly eight falsy values. Everything else — including <code>[]</code>, <code>{}</code>, and <code>"0"</code> — is truthy.', l: 'js', lab: 1, c:
+`// FALSY: false, 0, -0, 0n, "", null, undefined, NaN
+// everything else is truthy
+
+console.log(Boolean([]));      // true  (!)
+console.log(Boolean({}));      // true  (!)
+console.log(Boolean('0'));     // true  (!)
+console.log(Boolean(''));      // false
+
+// ?? only falls back on null/undefined; || falls back on ANY falsy value
+const a = 0 || 'fallback';     // 'fallback'  <- probably a bug
+const b = 0 ?? 'fallback';     // 0           <- usually what you meant
+console.log(a, b);` }
+    ]
+  },
+  {
+    id: 'ops', t: 'Operators', note: 'Comparison, logic, and the modern shorthands that cut whole if-blocks down to one line.',
+    items: [
+      { n: 'Comparison', d: 'Use <b>===</b> always. <code>==</code> coerces types and produces genuinely surreal results.', l: 'js', lab: 1, c:
+`console.log(1 == '1');    // true   — coerced
+console.log(1 === '1');   // false  — strict, use this
+console.log(null == undefined);   // true
+console.log(null === undefined);  // false
+console.log(NaN === NaN); // false — use Number.isNaN()
+console.log([] == false); // true   — never write this
+
+console.log(Object.is(NaN, NaN)); // true — the honest comparison` },
+      { n: 'Logic & shorthands', d: 'Optional chaining and nullish assignment remove most defensive if-statements.', l: 'js', lab: 1, c:
+`const user = { profile: { name: 'Adam' } };
+
+console.log(user?.profile?.name);     // 'Adam'
+console.log(user?.settings?.theme);   // undefined, no crash
+console.log(user.save?.());           // undefined, no crash if missing
+console.log(user.tags?.[0]);          // safe index access
+
+let opts = {};
+opts.retries ??= 3;        // set only if null/undefined
+opts.count ||= 10;         // set if falsy
+opts.debug &&= false;      // set only if already truthy
+console.log(opts);
+
+const label = user.name || 'Anonymous';
+const flag = !!user;       // coerce to real boolean` },
+      { n: 'Math & numbers', d: 'Floating point is binary — 0.1 + 0.2 is famously not 0.3.', l: 'js', lab: 1, c:
+`console.log(7 / 2, 7 % 2, 2 ** 10);   // 3.5  1  1024
+console.log(0.1 + 0.2);               // 0.30000000000000004
+console.log((0.1 + 0.2).toFixed(2));  // '0.30'  (string!)
+
+console.log(Math.round(4.5), Math.floor(-1.5), Math.ceil(1.1));
+console.log(Math.max(3, 9, 2), Math.min(...[3, 9, 2]));
+console.log(Math.abs(-5), Math.sqrt(16), Math.hypot(3, 4));
+console.log(Math.random());                       // 0 <= n < 1
+console.log(Math.floor(Math.random() * 6) + 1);   // d6
+
+console.log(Number('42'), parseInt('42px'), parseFloat('3.14rem'));
+console.log((1234567.891).toLocaleString('en-US', {
+  style: 'currency', currency: 'USD'
+}));` }
+    ]
+  },
+  {
+    id: 'strings', t: 'Strings', note: 'Immutable — every method returns a new string rather than changing the original.',
+    items: [
+      { n: 'Template literals', d: 'Backticks. Interpolation, real newlines, and expressions inline.', l: 'js', lab: 1, c:
+`const name = 'Adam', items = 3;
+
+const msg = \`Hi \${name}, you have \${items} item\${items === 1 ? '' : 's'}.
+This line break is real.\`;
+console.log(msg);
+
+// build HTML safely-ish (never interpolate untrusted input into innerHTML)
+const row = \`<li class="row">\${name}</li>\`;
+console.log(row);` },
+      { n: 'The methods you need', d: 'Search, slice, pad, trim, split.', l: 'js', lab: 1, c:
+`const s = '  Three Layers  ';
+console.log(s.trim(), s.trimStart().length);
+console.log(s.length, s.toUpperCase(), s.toLowerCase());
+console.log('layers'.includes('yer'), 'a.js'.endsWith('.js'), 'httpx'.startsWith('http'));
+console.log('abcdef'.slice(1, 4), 'abcdef'.slice(-2));   // 'bcd' 'ef'
+console.log('a-b-c'.split('-'));                          // ['a','b','c']
+console.log('a-b-c'.replace('-', '+'));                   // first only
+console.log('a-b-c'.replaceAll('-', '+'));                // all
+console.log('5'.padStart(3, '0'), 'x'.repeat(4));         // '005' 'xxxx'
+console.log('Layers'.at(-1), 'Layers'.indexOf('y'));      // 's' 2
+console.log([...'héllo'].length);                          // safe unicode count` },
+      { n: 'Regex basics', d: 'Pattern matching. <b>g</b> = all matches, <b>i</b> = case-insensitive.', l: 'js', lab: 1, c:
+`const re = /(\\d{3})-(\\d{4})/;
+console.log('call 417-5550'.match(re));
+console.log(re.test('417-5550'));                 // true
+
+console.log('a1b2c3'.replace(/\\d/g, '#'));        // a#b#c#
+console.log('Hello World'.match(/\\w+/g));         // ['Hello','World']
+
+// named groups
+const d = '2026-08-18'.match(/(?<y>\\d{4})-(?<m>\\d{2})/);
+console.log(d.groups.y, d.groups.m);` }
+    ]
+  },
+  {
+    id: 'arrays', t: 'Arrays', note: 'The workhorse. Learn map / filter / reduce and you can stop writing for-loops almost entirely.',
+    items: [
+      { n: 'Mutating vs returning', d: 'The left column changes the original array. The right column hands you a new one.', l: 'js', lab: 1, c:
+`const a = [3, 1, 2];
+
+// MUTATES the original:
+a.push(4); a.pop(); a.shift(); a.unshift(0);
+a.splice(1, 2);           // remove 2 items starting at index 1
+a.sort(); a.reverse();
+
+// RETURNS a new array, original untouched:
+const b = [3, 1, 2];
+console.log(b.slice(0, 2));          // [3,1]
+console.log(b.concat([9]));          // [3,1,2,9]
+console.log(b.toSorted());           // [1,2,3] — b unchanged
+console.log(b.toReversed(), b);      // [2,1,3]  [3,1,2]
+console.log([...b, 9]);              // spread copy` },
+      { n: 'map / filter / reduce', d: 'Transform, narrow, collapse. These three cover most of what you will ever do to a list.', l: 'js', lab: 1, c:
+`const cart = [
+  { item: 'sensor', qty: 4, price: 12 },
+  { item: 'panel',  qty: 1, price: 240 },
+  { item: 'siren',  qty: 2, price: 35 }
+];
+
+const names = cart.map(p => p.item);
+const big = cart.filter(p => p.price > 30);
+const total = cart.reduce((sum, p) => sum + p.qty * p.price, 0);
+
+console.log(names);
+console.log(big.map(p => p.item));
+console.log('Total: $' + total);
+
+// reduce into an object (group by)
+const byPrice = cart.reduce((acc, p) => {
+  const key = p.price > 30 ? 'high' : 'low';
+  (acc[key] ||= []).push(p.item);
+  return acc;
+}, {});
+console.log(byPrice);` },
+      { n: 'Searching & testing', d: '<b>find</b> gives the item, <b>findIndex</b> gives the position, <b>some/every</b> give a boolean.', l: 'js', lab: 1, c:
+`const nums = [4, 8, 15, 16, 23, 42];
+
+console.log(nums.find(n => n > 10));        // 15
+console.log(nums.findIndex(n => n > 10));   // 2
+console.log(nums.findLast(n => n < 20));    // 16
+console.log(nums.includes(23));             // true
+console.log(nums.indexOf(15));              // 2
+console.log(nums.some(n => n % 2));         // true — any odd?
+console.log(nums.every(n => n > 0));        // true — all positive?
+console.log(nums.at(-1));                   // 42 — last item` },
+      { n: 'Sorting properly', d: '<b>sort()</b> compares as <b>strings</b> by default. Always pass a comparator for numbers.', l: 'js', lab: 1, c:
+`console.log([10, 9, 100].sort());              // [10, 100, 9]  <- string sort!
+console.log([10, 9, 100].sort((a, b) => a - b)); // [9, 10, 100]
+
+const people = [{ n: 'Bo', age: 30 }, { n: 'Al', age: 25 }];
+console.log(people.toSorted((a, b) => a.age - b.age).map(p => p.n));
+console.log(people.toSorted((a, b) => a.n.localeCompare(b.n)).map(p => p.n));` },
+      { n: 'Building & flattening', d: 'Create arrays from nothing, from anything iterable, or from a nested mess.', l: 'js', lab: 1, c:
+`console.log(Array.from({ length: 5 }, (_, i) => i * 2));  // [0,2,4,6,8]
+console.log(Array(3).fill('x'));                          // ['x','x','x']
+console.log([[1, 2], [3, [4]]].flat(2));                  // [1,2,3,4]
+console.log([1, 2, 3].flatMap(n => [n, n * 10]));         // [1,10,2,20,3,30]
+console.log([...new Set([1, 1, 2, 3, 3])]);               // dedupe -> [1,2,3]
+console.log([1,2,3].join(' · '));
+console.log(Object.entries({a:1, b:2}));                  // [['a',1],['b',2]]` }
+    ]
+  },
+  {
+    id: 'objects', t: 'Objects, destructuring & spread', note: 'Key/value bags. Destructuring is how you get things out of them without repeating yourself.',
+    items: [
+      { n: 'Objects', d: 'Dot notation when you know the key, brackets when it is dynamic.', l: 'js', lab: 1, c:
+`const key = 'status';
+const job = {
+  id: 42,
+  title: 'DC 46 retrofit',
+  [key]: 'active',                    // computed key
+  meta: { site: 'Springfield' },
+  start() { return \`starting \${this.title}\`; }   // method shorthand
+};
+
+console.log(job.title, job['status'], job.meta.site);
+console.log(job.start());
+console.log('title' in job, job.hasOwnProperty('id'));
+
+delete job.id;
+console.log(Object.keys(job), Object.values(job).length);` },
+      { n: 'Destructuring', d: 'Pull values out by name, with renaming and defaults built in.', l: 'js', lab: 1, c:
+`const job = { title: 'Retrofit', site: 'DC 46', tags: ['alarm', 'camera'] };
+
+const { title, site: location, budget = 0 } = job;
+console.log(title, location, budget);
+
+const [first, ...restTags] = job.tags;
+console.log(first, restTags);
+
+// nested + in function params
+function log({ title, tags: [lead] = [] }) {
+  console.log(title, '->', lead);
+}
+log(job);
+
+// swap without a temp variable
+let a = 1, b = 2;
+[a, b] = [b, a];
+console.log(a, b);` },
+      { n: 'Spread & rest', d: 'Same three dots, opposite jobs: spread unpacks, rest collects.', l: 'js', lab: 1, c:
+`const base = { retries: 3, debug: false };
+const opts = { ...base, debug: true };      // later keys win
+console.log(opts);
+
+const merged = [...[1, 2], ...[3, 4]];
+console.log(merged);
+
+function sum(...nums) {                     // rest: collect into an array
+  return nums.reduce((t, n) => t + n, 0);
+}
+console.log(sum(1, 2, 3, 4));
+
+// shallow copy caveat: nested objects are still shared
+const deep = structuredClone(base);         // real deep copy
+console.log(deep);` },
+      { n: 'Object utilities', d: 'Convert to and from arrays and you unlock every array method for objects.', l: 'js', lab: 1, c:
+`const scores = { al: 3, bo: 9, cy: 5 };
+
+console.log(Object.keys(scores));
+console.log(Object.values(scores));
+console.log(Object.entries(scores));
+
+const doubled = Object.fromEntries(
+  Object.entries(scores).map(([k, v]) => [k, v * 2])
+);
+console.log(doubled);
+
+const top = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
+console.log('winner:', top[0]);
+
+console.log(Object.assign({}, scores, { dee: 1 }));
+Object.freeze(scores);` },
+      { n: 'Map & Set', d: 'Map takes <b>any</b> type as a key and remembers insertion order. Set stores unique values.', l: 'js', lab: 1, c:
+`const m = new Map();
+m.set('a', 1).set({ id: 2 }, 'object key!');
+console.log(m.get('a'), m.size, m.has('a'));
+for (const [k, v] of m) console.log(k, v);
+
+const s = new Set([1, 2, 2, 3]);
+s.add(4); s.delete(1);
+console.log([...s], s.has(3), s.size);` }
+    ]
+  },
+  {
+    id: 'functions', t: 'Functions & control flow', note: 'Arrow functions are not just shorter — they inherit <b>this</b> from the surrounding scope.',
+    items: [
+      { n: 'Declaring functions', d: 'Declarations hoist; arrow functions and expressions do not.', l: 'js', lab: 1, c:
+`function classic(a, b = 10) { return a + b; }   // hoisted
+const expr = function (a) { return a * 2; };
+const arrow = (a) => a * 2;                     // implicit return
+const noArgs = () => 'hi';
+const obj = () => ({ wrapped: true });          // parens to return an object
+const multi = (a, b) => {
+  const sum = a + b;
+  return sum;
+};
+
+console.log(classic(5), arrow(4), obj(), multi(2, 3));
+
+// default + rest together
+const tag = (label, ...rest) => \`\${label}: \${rest.join(', ')}\`;
+console.log(tag('tags', 'alarm', 'camera'));` },
+      { n: 'Control flow', d: 'Guard clauses beat nested ifs. Return early and keep the happy path unindented.', l: 'js', lab: 1, c:
+`const n = 7;
+
+if (n > 10) console.log('big');
+else if (n > 5) console.log('medium');
+else console.log('small');
+
+console.log(n % 2 ? 'odd' : 'even');       // ternary
+
+switch (typeof n) {
+  case 'number': console.log('a number'); break;
+  case 'string': console.log('a string'); break;
+  default: console.log('something else');
+}
+
+for (const c of 'abc') console.log(c);            // values of an iterable
+for (const k in { x: 1, y: 2 }) console.log(k);   // KEYS of an object
+[1, 2, 3].forEach((v, i) => console.log(i, v));
+
+let i = 0;
+while (i < 3) { if (i === 1) { i++; continue; } console.log('w', i++); }` },
+      { n: 'Scope & closures', d: 'An inner function keeps access to the variables it was born with — forever. That is a closure.', l: 'js', lab: 1, c:
+`function counter() {
+  let count = 0;                 // private, survives every call
+  return {
+    inc: () => ++count,
+    get: () => count
+  };
+}
+const c = counter();
+c.inc(); c.inc();
+console.log(c.get());            // 2 — nothing else can touch count
+
+// classic gotcha, solved by let being block-scoped
+for (let i = 0; i < 3; i++) setTimeout(() => console.log('let', i), 0);
+for (var j = 0; j < 3; j++) setTimeout(() => console.log('var', j), 0);` },
+      { n: 'Classes', d: 'Syntax sugar over prototypes. <b>#</b> makes a field genuinely private.', l: 'js', lab: 1, c:
+`class Ticket {
+  static count = 0;
+  #secret = 'internal';           // truly private
+
+  constructor(title) {
+    this.title = title;
+    Ticket.count++;
+  }
+  get label() { return \`#\${Ticket.count} \${this.title}\`; }
+  close() { return \`\${this.title} closed\`; }
+}
+
+class Urgent extends Ticket {
+  constructor(title) { super('!! ' + title); }
+  close() { return super.close().toUpperCase(); }
+}
+
+const t = new Urgent('Panel offline');
+console.log(t.label);
+console.log(t.close());
+console.log(t instanceof Ticket);` }
+    ]
+  },
+  {
+    id: 'dom', t: 'The DOM', note: 'The live tree of your page. Selecting, reading, and changing it is most of what front-end JS actually does.',
+    items: [
+      { n: 'Selecting', d: '<b>querySelector</b> takes any CSS selector. It is the only one you really need.', l: 'js', lab: 1, c:
+`document.body.innerHTML = '<ul id="list"><li class="row">A</li><li class="row">B</li></ul>';
+
+const one = document.querySelector('.row');        // first match, or null
+const all = document.querySelectorAll('.row');     // static NodeList
+const byId = document.getElementById('list');
+
+console.log(one.textContent, all.length);
+console.log([...all].map(el => el.textContent));   // spread to use array methods
+
+console.log(one.closest('ul').id);                 // walk UP the tree
+console.log(byId.children.length);                 // element children
+console.log(one.nextElementSibling.textContent);` },
+      { n: 'Reading & writing content', d: '<b>textContent</b> is safe. <b>innerHTML</b> executes markup — never feed it user input.', l: 'js', lab: 1, c:
+`const el = document.createElement('div');
+el.textContent = 'Plain text — always safe';
+el.innerHTML = '<strong>Parsed as HTML</strong>';
+document.body.append(el);
+
+el.insertAdjacentHTML('beforeend', '<em> appended</em>');
+// positions: beforebegin | afterbegin | beforeend | afterend
+
+console.log(el.textContent);
+console.log(el.innerHTML);` },
+      { n: 'Creating & placing nodes', d: 'Build in memory, then insert once. Touching the DOM in a loop is what makes pages feel slow.', l: 'js', lab: 1, c:
+`const list = document.createElement('ul');
+
+const frag = document.createDocumentFragment();
+['Panel', 'Sensor', 'Siren'].forEach(name => {
+  const li = document.createElement('li');
+  li.textContent = name;
+  li.dataset.kind = name.toLowerCase();
+  frag.append(li);
+});
+list.append(frag);                 // one single reflow
+document.body.append(list);
+
+console.log(list.children.length, list.firstElementChild.dataset.kind);
+// list.prepend(x) | before(x) | after(x) | replaceWith(x) | remove()` },
+      { n: 'Classes, attributes, styles', d: '<b>classList.toggle</b> with a boolean is the cleanest way to sync state to the DOM.', l: 'js', lab: 1, c:
+`const el = document.createElement('button');
+el.textContent = 'Toggle me';
+document.body.append(el);
+
+el.classList.add('btn', 'primary');
+el.classList.remove('primary');
+el.classList.toggle('open');           // flip
+el.classList.toggle('open', false);    // force off — great for state syncing
+console.log(el.classList.contains('btn'), el.className);
+
+el.setAttribute('aria-pressed', 'false');
+console.log(el.getAttribute('aria-pressed'), el.hasAttribute('id'));
+
+el.dataset.ticketId = '42';            // <button data-ticket-id="42">
+console.log(el.dataset.ticketId);
+
+el.style.color = 'crimson';
+el.style.setProperty('--brand', '#6E8CFF');
+console.log(getComputedStyle(el).color);   // the RESOLVED value` }
+    ]
+  },
+  {
+    id: 'events', t: 'Events', note: 'Everything the user does fires an event. Delegation lets one listener handle a thousand elements.',
+    items: [
+      { n: 'Listening', d: 'Options matter: <b>once</b> auto-removes, <b>signal</b> lets you cancel a whole batch at a time.', l: 'js', lab: 1, c:
+`const btn = document.createElement('button');
+btn.textContent = 'Click me';
+document.body.append(btn);
+
+function onClick(e) {
+  console.log('clicked', e.target.tagName, e.clientX, e.clientY);
+}
+btn.addEventListener('click', onClick);
+btn.addEventListener('click', () => console.log('runs once'), { once: true });
+
+// removal needs the SAME function reference
+// btn.removeEventListener('click', onClick);
+
+// cancel many listeners at once
+const ac = new AbortController();
+window.addEventListener('resize', () => {}, { signal: ac.signal });
+// ac.abort();
+
+btn.click(); btn.click();` },
+      { n: 'Event delegation', d: 'Listen on the parent, ask <b>closest()</b> what was hit. Works for elements added later.', l: 'js', lab: 1, c:
+`document.body.innerHTML = \`
+  <ul id="list">
+    <li><button data-id="1">Open 1</button></li>
+    <li><button data-id="2">Open 2</button></li>
+  </ul>\`;
+
+document.getElementById('list').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-id]');
+  if (!btn) return;                     // clicked the gap, ignore
+  console.log('opened ticket', btn.dataset.id);
+});
+
+document.querySelector('[data-id="2"]').click();` },
+      { n: 'The event object', d: '<b>stopPropagation</b> stops the bubble; <b>preventDefault</b> stops the browser\'s built-in reaction.', l: 'js', lab: 1, c:
+`document.body.innerHTML = '<form id="f"><input name="site" value="DC 46"><button>Go</button></form>';
+
+document.getElementById('f').addEventListener('submit', (e) => {
+  e.preventDefault();                    // stop the page reload
+  const data = new FormData(e.target);
+  console.log(Object.fromEntries(data)); // { site: 'DC 46' }
+  console.log('type:', e.type, 'bubbles:', e.bubbles);
+});
+
+document.querySelector('#f button').click();
+
+// common events: click dblclick input change submit focus blur
+// keydown keyup pointerdown pointermove scroll resize
+// DOMContentLoaded load visibilitychange` },
+      { n: 'Custom events', d: 'Your own components can broadcast. This is how you decouple modules without a framework.', l: 'js', lab: 1, c:
+`document.addEventListener('ticket:closed', (e) => {
+  console.log('heard it:', e.detail.id, e.detail.by);
+});
+
+document.dispatchEvent(new CustomEvent('ticket:closed', {
+  detail: { id: 42, by: 'adam' },
+  bubbles: true
+}));` }
+    ]
+  },
+  {
+    id: 'async', t: 'Async: promises, await, fetch', note: 'JavaScript is single-threaded. Async work goes in a queue and comes back later — these are the tools for handling "later".',
+    items: [
+      { n: 'Promises', d: 'A value that is not here yet. It settles once: fulfilled or rejected.', l: 'js', lab: 1, c:
+`const wait = (ms, value) => new Promise(resolve => setTimeout(() => resolve(value), ms));
+
+wait(50, 'done')
+  .then(v => { console.log('then:', v); return v.toUpperCase(); })
+  .then(v => console.log('chained:', v))
+  .catch(err => console.log('catch:', err.message))
+  .finally(() => console.log('finally: always runs'));
+
+Promise.reject(new Error('boom')).catch(e => console.log('caught', e.message));` },
+      { n: 'async / await', d: 'The same thing, written like normal code. <b>await</b> only works inside an <b>async</b> function.', l: 'js', lab: 1, c:
+`const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));
+
+async function run() {
+  try {
+    const a = await wait(30, 'first');
+    console.log(a);
+
+    // SEQUENTIAL — 60ms total. usually not what you want.
+    const s1 = await wait(30, 'A'); const s2 = await wait(30, 'B');
+
+    // PARALLEL — 30ms total.
+    const [x, y] = await Promise.all([wait(30, 'X'), wait(30, 'Y')]);
+    console.log('parallel:', x, y);
+  } catch (err) {
+    console.log('failed:', err.message);
+  }
+}
+run();` },
+      { n: 'Promise combinators', d: 'Four ways to wait on many at once.', l: 'js', lab: 1, c:
+`const ok = (v, ms = 20) => new Promise(r => setTimeout(() => r(v), ms));
+const no = (v) => Promise.reject(new Error(v));
+
+Promise.all([ok(1), ok(2)]).then(r => console.log('all:', r));
+Promise.allSettled([ok(1), no('bad')]).then(r => console.log('allSettled:', r.map(x => x.status)));
+Promise.race([ok('fast', 10), ok('slow', 90)]).then(r => console.log('race:', r));
+Promise.any([no('a'), ok('first success')]).then(r => console.log('any:', r));
+
+// all      -> rejects if ANY reject
+// allSettled -> never rejects, gives you status per item
+// race     -> first to SETTLE, win or lose
+// any      -> first to SUCCEED` },
+      { n: 'fetch', d: 'A 404 does not throw. You have to check <b>response.ok</b> yourself — this trips up everyone once.', l: 'js', c:
+`async function getJSON(url) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ site: 'DC 46' }),
+    signal: AbortSignal.timeout(5000)
+  });
+
+  if (!res.ok) throw new Error(\`HTTP \${res.status} \${res.statusText}\`);
+  return res.json();     // or .text() .blob() .formData()
+}
+
+getJSON('/api/tickets')
+  .then(data => console.log(data))
+  .catch(err => console.error(err.message));` },
+      { n: 'Timers & scheduling', d: 'Debounce for typing, throttle for scrolling, rAF for anything that animates.', l: 'js', lab: 1, c:
+`const id = setTimeout(() => console.log('once, later'), 40);
+const tick = setInterval(() => console.log('repeat'), 20);
+setTimeout(() => clearInterval(tick), 70);
+
+// debounce: wait until they STOP doing the thing
+function debounce(fn, ms = 300) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+const search = debounce(q => console.log('searching', q), 30);
+search('a'); search('ab'); search('abc');   // only the last one runs
+
+requestAnimationFrame(() => console.log('next paint'));` }
+    ]
+  },
+  {
+    id: 'data', t: 'Storage, JSON & modules', note: 'Persisting state, moving data across the wire, and splitting code into files.',
+    items: [
+      { n: 'JSON', d: '<b>stringify</b> silently drops functions, <code>undefined</code>, and symbols. Dates become strings.', l: 'js', lab: 1, c:
+`const obj = { id: 1, tags: ['a'], when: new Date(), fn: () => {}, gone: undefined };
+
+const text = JSON.stringify(obj);
+console.log(text);                              // fn and gone vanish
+console.log(JSON.stringify(obj, null, 2));      // pretty-printed
+console.log(JSON.stringify(obj, ['id', 'tags']));// allow-list of keys
+
+const back = JSON.parse(text);
+console.log(typeof back.when);                  // 'string' — not a Date
+
+try { JSON.parse('{oops}'); } catch (e) { console.log('parse failed'); }` },
+      { n: 'Web storage', d: '<b>localStorage</b> persists; <b>sessionStorage</b> dies with the tab. Both store strings only.', l: 'js', c:
+`localStorage.setItem('theme', 'dark');
+console.log(localStorage.getItem('theme'));
+localStorage.removeItem('theme');
+localStorage.clear();
+
+// objects must round-trip through JSON
+localStorage.setItem('draft', JSON.stringify({ title: 'Retrofit' }));
+const draft = JSON.parse(localStorage.getItem('draft') || '{}');
+
+// listen for changes from OTHER tabs
+window.addEventListener('storage', e => console.log(e.key, e.newValue));
+
+// bigger / structured / async: IndexedDB
+// per-request: document.cookie` },
+      { n: 'Modules', d: 'One default export per file, as many named exports as you like. Needs <code>type="module"</code>.', l: 'js', c:
+`// ---- utils.js ----
+export const VERSION = '1.0';
+export function slug(s) { return s.toLowerCase().replace(/\\s+/g, '-'); }
+export default class Store { }
+
+// ---- app.js ----
+import Store, { slug, VERSION as V } from './utils.js';
+import * as utils from './utils.js';
+
+const heavy = await import('./chart.js');   // lazy, on demand
+
+// modules are deferred, strict-mode, and scoped by default —
+// nothing leaks onto window` },
+      { n: 'URLs & query params', d: 'Never build query strings by hand — <b>URLSearchParams</b> encodes for you.', l: 'js', lab: 1, c:
+`const url = new URL('https://site.com/search?q=alarm&page=2#top');
+console.log(url.hostname, url.pathname, url.hash);
+console.log(url.searchParams.get('q'));
+
+url.searchParams.set('page', '3');
+url.searchParams.append('tag', 'dc 46');
+console.log(url.toString());
+
+const params = new URLSearchParams({ site: 'DC 46', open: 'true' });
+console.log(params.toString());
+console.log(Object.fromEntries(params));` }
+    ]
+  },
+  {
+    id: 'patterns', t: 'Patterns worth stealing', note: 'Small, reusable bits you will reach for in nearly every project.',
+    items: [
+      { n: 'Modern browser APIs', d: 'Observers do the work the old scroll-listener hacks used to do, and do it efficiently.', l: 'js', c:
+`// fade things in as they scroll into view
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => e.target.classList.toggle('visible', e.isIntersecting));
+}, { threshold: 0.2 });
+document.querySelectorAll('.card').forEach(el => io.observe(el));
+
+// react to an element resizing (not just the window)
+new ResizeObserver(([entry]) => console.log(entry.contentRect.width))
+  .observe(document.body);
+
+navigator.clipboard.writeText('copied!');
+await navigator.share({ title: 'Hi', url: location.href });
+console.log(crypto.randomUUID());
+console.log(matchMedia('(prefers-color-scheme: dark)').matches);` },
+      { n: 'Error handling', d: 'Catch what you can actually recover from. Custom error classes let callers branch on the type.', l: 'js', lab: 1, c:
+`class ValidationError extends Error {
+  constructor(field) {
+    super(\`Invalid field: \${field}\`);
+    this.name = 'ValidationError';
+    this.field = field;
+  }
+}
+
+function save(job) {
+  if (!job.title) throw new ValidationError('title');
+  return 'saved';
+}
+
+try {
+  console.log(save({}));
+} catch (err) {
+  if (err instanceof ValidationError) console.log(err.name, '->', err.field);
+  else throw err;                       // not mine, pass it up
+} finally {
+  console.log('cleanup runs either way');
+}` },
+      { n: 'Formatting data for humans', d: 'The <b>Intl</b> namespace handles currency, dates, plurals, and relative time in every locale.', l: 'js', lab: 1, c:
+`const n = 1234567.891;
+console.log(new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n));
+console.log(new Intl.NumberFormat('en', { notation: 'compact' }).format(n));
+
+const d = new Date('2026-08-18T14:30:00');
+console.log(new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(d));
+console.log(d.toISOString().slice(0, 10));
+
+const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+console.log(rtf.format(-1, 'day'), rtf.format(3, 'hour'));
+
+console.log(new Intl.ListFormat('en').format(['alarm', 'camera', 'access']));` }
+    ]
+  }
+  ]
+});
+DATA.push({
+  id: 'craft', label: 'Craft', num: '04', role: 'Semantics & formatting',
+  accent: 'var(--jade)',
+  tagline: 'The rules nobody teaches you but everybody judges you on. How code is named, spaced, ordered, and commented is what separates "it works" from "someone else can maintain this."',
+  groups: [
+  {
+    id: 'fmt', t: 'Formatting conventions', note: 'Consistency beats correctness here. Pick one style and never think about it again.',
+    items: [
+      { n: 'The house style', d: 'This is what Prettier does by default, and what most of the industry has settled on.', l: 'js', c:
+`// 2 spaces per indent level. never mix tabs and spaces.
+// semicolons: yes. they prevent a small class of real bugs.
+// single quotes in JS, double quotes in HTML attributes.
+// line length: soft limit ~80–100 characters.
+// one blank line between logical blocks. never two.
+// space after keywords and around operators.
+
+if (ready) {                        // space after 'if', brace on same line
+  const total = price * qty;        // spaces around operators
+  save({ id, total });              // spaces inside object braces
+}
+
+const list = [1, 2, 3];             // space after commas, none inside brackets
+fn(a, b);                           // no space before the paren` },
+      { n: 'HTML formatting', d: 'Indent one level per nesting level. Lowercase everything. Double-quote every attribute value.', l: 'html', c:
+`<!-- attributes in a stable order: id, class, then the rest -->
+<article id="post-1" class="card card--wide" data-state="open">
+  <h2 class="card__title">Title</h2>
+  <p>Short body.</p>
+</article>
+
+<!-- many attributes: one per line, aligned -->
+<input
+  type="email"
+  id="email"
+  name="email"
+  class="field"
+  autocomplete="email"
+  required
+>
+
+<!-- void elements need no closing slash in HTML5 -->
+<br> <hr> <img src="x.png" alt="">` },
+      { n: 'CSS formatting', d: 'One declaration per line, one selector per line, a blank line between rules.', l: 'css', c:
+`/* group related rules with a banner comment */
+/* ---------- Cards ---------- */
+
+.card,
+.card--wide {                /* one selector per line */
+  display: flex;             /* one declaration per line */
+  gap: 12px;
+  padding: 16px;
+}
+
+.card__title {
+  font-size: 1.25rem;
+}
+
+/* declaration order: layout -> box -> visual -> type -> misc
+   position/display/grid | width/margin/padding | bg/border/shadow
+   | font/color | transition/cursor                              */` }
+    ]
+  },
+  {
+    id: 'naming', t: 'Naming things', note: 'Different casing per language is not arbitrary — it signals which layer you are looking at.',
+    items: [
+      { n: 'Casing by language', d: 'Match the ecosystem you are in and readers instantly know what they are reading.', l: 'js', c:
+`// JavaScript
+const ticketCount = 0;         // camelCase — variables, functions
+class TicketQueue {}           // PascalCase — classes, components
+const MAX_RETRIES = 3;         // SCREAMING_SNAKE — true constants
+const #privateField = 0;       // # prefix — private class fields
+function _internalHelper() {}  // _ prefix — "do not use this outside"
+
+// CSS + HTML
+// .kebab-case for classes, ids, custom properties, data attributes
+// --brand-color, .card__title, data-ticket-id
+
+// files: kebab-case.js, PascalCase.jsx for components` },
+      { n: 'BEM for CSS classes', d: 'Block, Element, Modifier. Flat specificity, obvious ownership, no nesting wars.', l: 'css', c:
+`/* block: a standalone thing */
+.card { }
+
+/* element: a piece of the block — double underscore */
+.card__title { }
+.card__footer { }
+
+/* modifier: a variant — double dash */
+.card--featured { }
+.card__title--large { }
+
+/* state: separate, usually toggled by JS */
+.is-open { }
+.has-error { }
+
+/* never nest deeper than the block. .card .row .title is a smell. */` },
+      { n: 'Naming that reads', d: 'Names should answer "what is this" without needing a comment.', l: 'js', c:
+`// booleans read as questions
+const isOpen = true, hasPermission = false, canEdit = true, shouldRetry = false;
+
+// functions start with a verb
+function getTicket() {}    function fetchTickets() {}
+function renderRow() {}    function handleClick() {}
+function validateForm() {} function toTitleCase() {}
+
+// arrays are plural, single items are singular
+const tickets = [];  const ticket = tickets[0];
+
+// avoid: data, info, temp, obj, thing, doStuff, x2, handleClick2
+// prefer specific: openTickets, siteAddress, retryCount` }
+    ]
+  },
+  {
+    id: 'semantic-rules', t: 'Semantic rules of thumb', note: 'A short checklist that catches most markup problems before they ship.',
+    items: [
+      { n: 'The checklist', d: 'Run through this before you call a page done.', l: 'html', c:
+`✓ Exactly one <h1>, and headings never skip a level
+✓ Exactly one <main>, wrapping the page's unique content
+✓ Every <img> has alt (empty alt="" if decorative)
+✓ Every form input has a <label for="…">
+✓ Clickable = <button>. Navigational = <a href>. Never a <div>.
+✓ Lists of things are actually <ul>/<ol>
+✓ Link text makes sense read out of context
+✓ Language is set on <html lang="en">
+✓ Tables have <caption>, <th scope>, and no layout duty
+✓ Nothing important is conveyed by color alone
+✓ The whole page is operable with only a keyboard` },
+      { vs: [
+        { label: 'Says nothing', lang: 'html', code:
+`<div class="post">
+  <div class="big-text">Retrofit</div>
+  <div class="meta">Aug 18</div>
+  <div class="body">…</div>
+  <div class="link" onclick="more()">
+    Click here
+  </div>
+</div>` },
+        { label: 'Says everything', lang: 'html', code:
+`<article class="post">
+  <h2>Retrofit</h2>
+  <time datetime="2026-08-18">Aug 18</time>
+  <p>…</p>
+  <a href="/posts/retrofit">
+    Read the retrofit plan
+  </a>
+</article>` }
+      ]},
+      { call: 'A useful gut check: turn off CSS entirely. If the page still reads top to bottom as a sensible document — headings, paragraphs, lists, links — your semantics are right. If it turns into an unreadable pile, they are not.' }
+    ]
+  },
+  {
+    id: 'organize', t: 'Organizing a file', note: 'Predictable order means you find things by muscle memory instead of by search.',
+    items: [
+      { n: 'Stylesheet order', d: 'General to specific, top to bottom. Never fight yourself later in the file.', l: 'css', c:
+`/* 1. tokens      */ :root { --brand: #6E8CFF; }
+/* 2. reset       */ *, *::before, *::after { box-sizing: border-box; }
+/* 3. base        */ body, h1, p, a { }
+/* 4. layout      */ .shell, .grid, .rail { }
+/* 5. components  */ .card, .btn, .field { }
+/* 6. utilities   */ .visually-hidden, .mt-2 { }
+/* 7. media queries — either at the end, or beside their component */` },
+      { n: 'Script order', d: 'Same idea for a single-file app: constants, state, helpers, render, events, boot.', l: 'js', c:
+`/* ---------- 1. constants ---------- */
+const STORAGE_KEY = 'app:v1';
+
+/* ---------- 2. state ---------- */
+let tickets = [];
+
+/* ---------- 3. pure helpers ---------- */
+const slug = s => s.toLowerCase().replace(/\\s+/g, '-');
+
+/* ---------- 4. render ---------- */
+function render() { }
+
+/* ---------- 5. events ---------- */
+function bind() { }
+
+/* ---------- 6. boot ---------- */
+bind(); render();` },
+      { n: 'Comments that earn their space', d: 'Comment the <b>why</b>. The <b>what</b> is already in the code.', l: 'js', c:
+`// BAD — restates the code
+// increment count by one
+count++;
+
+// GOOD — explains a decision the code cannot
+// Panels report twice on restore; ignore the duplicate within 2s.
+if (Date.now() - lastSignal < 2000) return;
+
+// TODO: batch these writes once the queue endpoint ships
+// FIXME: breaks when the site has no address on file
+// HACK: Safari fires resize before layout settles — one frame delay
+
+/**
+ * Formats a ticket for the queue list.
+ * @param {{id:number, title:string}} ticket
+ * @returns {string}
+ */
+function format(ticket) { }` }
+    ]
+  },
+  {
+    id: 'debug', t: 'Debugging', note: 'Ninety percent of debugging is finding out what a value actually is, rather than what you assumed.',
+    items: [
+      { n: 'Console beyond log', d: '<b>console.table</b> on an array of objects is the single most underused tool in the browser.', l: 'js', lab: 1, c:
+`const rows = [{ id: 1, site: 'DC 46' }, { id: 2, site: 'DC 12' }];
+
+console.table(rows);
+console.log('%cStyled!', 'color:#FFC940;font-weight:700');
+console.group('Batch'); console.log('inside'); console.groupEnd();
+console.time('loop'); for (let i = 0; i < 1e5; i++); console.timeEnd('loop');
+console.count('hits'); console.count('hits');
+console.assert(rows.length > 5, 'expected more rows');
+console.dir(rows[0]);
+
+// object shorthand — logs { rows: [...] } so you see the name too
+console.log({ rows });` },
+      { n: 'DevTools shortcuts', d: 'The console has its own vocabulary that is not part of JavaScript.', l: 'js', c:
+`$0            // the element currently selected in the Elements panel
+$('.card')    // shorthand for document.querySelector
+$$('.card')   // shorthand for querySelectorAll — returns a real Array
+$_            // the value of the last expression you evaluated
+copy(obj)     // copies it to your clipboard
+monitorEvents($0, 'click')   // log every event on an element
+debugger;     // pause execution right here when DevTools is open
+
+// Elements panel: :hov forces hover state, right-click > Break on
+// > attribute modifications catches "who changed this class?"` },
+      { n: 'The five usual suspects', d: 'When something breaks, check these before anything else.', l: 'js', c:
+`// 1. Script ran before the element existed
+//    -> use defer, or put the script last, or DOMContentLoaded
+
+// 2. 'this' is not what you think inside a callback
+//    -> use an arrow function, or .bind(this)
+
+// 3. You compared with == and got a coercion surprise
+//    -> use ===
+
+// 4. You mutated an object you thought you had copied
+//    -> spread is SHALLOW. use structuredClone() for nested data.
+
+// 5. The CSS rule is being overridden, not ignored
+//    -> DevTools shows losing rules with a strikethrough. look there first.` }
+    ]
+  }
+  ]
+});
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const mount = document.getElementById('mount');
+const rail = document.getElementById('rail');
+
+function itemHTML(it) {
+  if (it.call) return '<div class="callout">' + it.call + '</div>';
+  if (it.w) return '<div class="widget" data-widget="' + it.w + '"></div>';
+  if (it.vs) {
+    return '<div class="vs">' +
+      '<div class="bad"><div class="lbl">✕ ' + it.vs[0].label + '</div><pre class="code">' + hl(it.vs[0].code, it.vs[0].lang) + '</pre></div>' +
+      '<div class="good"><div class="lbl">✓ ' + it.vs[1].label + '</div><pre class="code">' + hl(it.vs[1].code, it.vs[1].lang) + '</pre></div>' +
+      '</div>';
+  }
+  const lab = it.lab
+    ? '<div class="lab"><textarea spellcheck="false" data-lang="' + it.l + '"></textarea>' +
+      '<div class="out"><iframe title="Live preview" sandbox="allow-scripts allow-modals"></iframe></div>' +
+      '<div class="lab-bar"><span>EDIT THE CODE — IT RE-RUNS AS YOU TYPE</span><span>' + it.l.toUpperCase() + ' SANDBOX</span></div></div>'
+    : '';
+  return '<article class="card">' +
+    '<div class="card-top">' +
+      '<span class="name">' + esc(it.n) + '</span>' +
+      '<span class="desc">' + it.d + '</span>' +
+      '<span class="card-actions">' +
+        (it.lab ? '<button class="mini js-run">▶ RUN</button>' : '') +
+        '<button class="mini js-copy">COPY</button>' +
+      '</span>' +
+    '</div>' +
+    '<pre class="code">' + hl(it.c, it.l) + '</pre>' +
+    lab +
+    '</article>';
+}
+
+let html = '', railHTML = '';
+DATA.forEach(layer => {
+  railHTML += '<div style="--rail-accent:' + layer.accent + '"><h4>' + layer.num + ' · ' + layer.label + '</h4>' +
+    layer.groups.map(g => '<a href="#' + g.id + '">' + g.t + '</a>').join('') + '</div>';
+
+  html += '<section class="layer" id="' + layer.id + '" style="--accent:' + layer.accent + '">' +
+    '<div class="layer-head"><span class="num">' + layer.num + '</span>' +
+    '<div><p class="role">' + layer.role + '</p><h2>' + layer.label + '</h2></div>' +
+    '<p>' + layer.tagline + '</p></div>';
+
+  layer.groups.forEach(g => {
+    html += '<div class="group" id="' + g.id + '"><h3>' + g.t + '</h3><p class="note">' + g.note + '</p><div class="cards">';
+    g.items.forEach(it => { html += itemHTML(it); });
+    html += '</div></div>';
+  });
+  html += '</section>';
+});
+mount.innerHTML = html;
+rail.innerHTML = railHTML;
+
+/* seed the editable sandboxes from their rendered code */
+document.querySelectorAll('.card').forEach(card => {
+  const ta = card.querySelector('.lab textarea');
+  if (ta) ta.value = card.querySelector('pre.code').textContent;
+});
+
+/* ============================================================
+   CARD INTERACTIONS
+   ============================================================ */
+mount.addEventListener('click', e => {
+  const run = e.target.closest('.js-run');
+  if (run) {
+    const card = run.closest('.card');
+    const lab = card.querySelector('.lab');
+    const open = lab.classList.toggle('open');
+    run.textContent = open ? '■ CLOSE' : '▶ RUN';
+    if (open) runLab(card);
+    return;
+  }
+  const copy = e.target.closest('.js-copy');
+  if (copy) {
+    const code = copy.closest('.card').querySelector('pre.code').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+      copy.textContent = 'COPIED';
+      copy.classList.add('done');
+      setTimeout(() => { copy.textContent = 'COPY'; copy.classList.remove('done'); }, 1400);
+    }, () => { copy.textContent = 'BLOCKED'; });
+  }
+});
+
+let typeTimer;
+mount.addEventListener('input', e => {
+  if (!e.target.matches('.lab textarea')) return;
+  clearTimeout(typeTimer);
+  const card = e.target.closest('.card');
+  typeTimer = setTimeout(() => runLab(card), 500);
+});
+
+/* ============================================================
+   WIDGETS
+   ============================================================ */
+function widgetSpecificity(el) {
+  el.innerHTML =
+    '<h4>Specificity calculator</h4><p class="sub">Type any selector. Higher numbers win, read left to right.</p>' +
+    '<input type="text" value="#nav .item > a:hover" spellcheck="false" aria-label="Selector">' +
+    '<div class="spec-score">' +
+      '<div class="spec-cell i"><div class="v" data-i>0</div><div class="k">IDs</div></div>' +
+      '<div class="spec-cell c"><div class="v" data-c>0</div><div class="k">Classes · attrs · pseudo</div></div>' +
+      '<div class="spec-cell e"><div class="v" data-e>0</div><div class="k">Elements</div></div>' +
+    '</div><p class="spec-verdict"></p>';
+
+  const input = el.querySelector('input');
+  const calc = () => {
+    let s = input.value;
+    s = s.replace(/:where\([^)]*\)/g, ' ');           // :where() is always zero
+    s = s.replace(/\/\*[\s\S]*?\*\//g, ' ');
+    const ids = (s.match(/#[\w-]+/g) || []).length;
+    const cls = (s.match(/\.[\w-]+|\[[^\]]+\]|:(?!:)[\w-]+(\([^)]*\))?/g) || []).length;
+    const els = (s.replace(/[#.][\w-]+|\[[^\]]+\]|::?[\w-]+(\([^)]*\))?/g, ' ')
+                  .match(/[a-zA-Z][\w-]*/g) || []).length;
+    el.querySelector('[data-i]').textContent = ids;
+    el.querySelector('[data-c]').textContent = cls;
+    el.querySelector('[data-e]').textContent = els;
+    const v = el.querySelector('.spec-verdict');
+    const score = '0,' + ids + ',' + cls + ',' + els;
+    let note = ids > 1 ? 'Two IDs deep — this will be painful to override.'
+      : ids ? 'An ID here outranks any number of classes below it.'
+      : cls > 3 ? 'Getting heavy. Try flattening to a single class.'
+      : 'Nice and low. Easy to override when you need to.';
+    v.innerHTML = 'Score <b>' + score + '</b> — ' + note;
+  };
+  input.addEventListener('input', calc);
+  calc();
+}
+
+function widgetBoxModel(el) {
+  el.innerHTML =
+    '<h4>Box model</h4><p class="sub">Drag to see how padding, border, and margin change the space an element occupies.</p>' +
+    '<div class="ctrl-grid">' +
+      '<div><label>Padding <span data-l="pd">14</span>px</label><input type="range" data-r="pd" min="0" max="40" value="14"></div>' +
+      '<div><label>Border <span data-l="bd">4</span>px</label><input type="range" data-r="bd" min="0" max="20" value="4"></div>' +
+      '<div><label>Margin <span data-l="mg">18</span>px</label><input type="range" data-r="mg" min="0" max="50" value="18"></div>' +
+    '</div>' +
+    '<div class="bm"><div class="m"><div class="b"><div class="p"><div class="c">content</div></div></div></div></div>' +
+    '<div class="bm-legend">' +
+      '<span><i style="background:#FF6B3D"></i>margin</span>' +
+      '<span><i style="background:#6E8CFF"></i>border</span>' +
+      '<span><i style="background:#FFC940"></i>padding</span>' +
+      '<span><i style="background:#38D9A9"></i>content</span>' +
+    '</div><div class="readout"></div>';
+
+  const bm = el.querySelector('.bm');
+  const sync = () => {
+    const g = k => +el.querySelector('[data-r="' + k + '"]').value;
+    const pd = g('pd'), bd = g('bd'), mg = g('mg');
+    ['pd', 'bd', 'mg'].forEach(k => el.querySelector('[data-l="' + k + '"]').textContent = g(k));
+    bm.style.setProperty('--pd', pd + 'px');
+    bm.style.setProperty('--bd', bd + 'px');
+    bm.style.setProperty('--mg', mg + 'px');
+    const extra = (pd + bd) * 2;
+    el.querySelector('.readout').textContent =
+      '.box { width: 200px; padding: ' + pd + 'px; border: ' + bd + 'px solid; margin: ' + mg + 'px; }\n\n' +
+      'content-box  →  rendered width ' + (200 + extra) + 'px, footprint ' + (200 + extra + mg * 2) + 'px\n' +
+      'border-box   →  rendered width 200px, footprint ' + (200 + mg * 2) + 'px';
+  };
+  el.querySelectorAll('input').forEach(i => i.addEventListener('input', sync));
+  sync();
+}
+
+function selectCtl(label, prop, opts) {
+  return '<div><label>' + label + '</label><select data-p="' + prop + '">' +
+    opts.map(o => '<option>' + o + '</option>').join('') + '</select></div>';
+}
+
+function widgetFlex(el) {
+  el.innerHTML =
+    '<h4>Flexbox playground</h4><p class="sub">Change a value and watch the boxes move. The CSS underneath updates with you.</p>' +
+    '<div class="ctrl-grid">' +
+      selectCtl('flex-direction', 'flexDirection', ['row', 'row-reverse', 'column', 'column-reverse']) +
+      selectCtl('justify-content', 'justifyContent', ['flex-start', 'center', 'flex-end', 'space-between', 'space-around', 'space-evenly']) +
+      selectCtl('align-items', 'alignItems', ['stretch', 'center', 'flex-start', 'flex-end']) +
+      selectCtl('flex-wrap', 'flexWrap', ['nowrap', 'wrap']) +
+      selectCtl('gap', 'gap', ['12px', '0px', '24px', '48px']) +
+    '</div>' +
+    '<div class="play"><div class="item">1</div><div class="item">2</div><div class="item">3</div></div>' +
+    '<div class="readout"></div>';
+
+  const play = el.querySelector('.play');
+  const sync = () => {
+    const out = [];
+    el.querySelectorAll('select').forEach(s => {
+      play.style[s.dataset.p] = s.value;
+      out.push('  ' + s.dataset.p.replace(/[A-Z]/g, m => '-' + m.toLowerCase()) + ': ' + s.value + ';');
+    });
+    el.querySelector('.readout').textContent = '.parent {\n  display: flex;\n' + out.join('\n') + '\n}';
+  };
+  el.querySelectorAll('select').forEach(s => s.addEventListener('change', sync));
+  sync();
+}
+
+function widgetGrid(el) {
+  el.innerHTML =
+    '<h4>Grid playground</h4><p class="sub">Six items, one container. Try auto-fit — it is the responsive grid with no media query.</p>' +
+    '<div class="ctrl-grid">' +
+      selectCtl('grid-template-columns', 'gridTemplateColumns',
+        ['repeat(3, 1fr)', 'repeat(auto-fit, minmax(120px, 1fr))', '1fr 2fr', '200px 1fr', 'repeat(2, 1fr)']) +
+      selectCtl('gap', 'gap', ['12px', '0px', '24px']) +
+      selectCtl('justify-items', 'justifyItems', ['stretch', 'center', 'start', 'end']) +
+    '</div>' +
+    '<div class="play g">' + [1, 2, 3, 4, 5, 6].map(n => '<div class="item">' + n + '</div>').join('') + '</div>' +
+    '<div class="readout"></div>';
+
+  const play = el.querySelector('.play');
+  const sync = () => {
+    const out = [];
+    el.querySelectorAll('select').forEach(s => {
+      play.style[s.dataset.p] = s.value;
+      out.push('  ' + s.dataset.p.replace(/[A-Z]/g, m => '-' + m.toLowerCase()) + ': ' + s.value + ';');
+    });
+    el.querySelector('.readout').textContent = '.grid {\n  display: grid;\n' + out.join('\n') + '\n}';
+  };
+  el.querySelectorAll('select').forEach(s => s.addEventListener('change', sync));
+  sync();
+}
+
+const WIDGETS = { specificity: widgetSpecificity, boxmodel: widgetBoxModel, flexbox: widgetFlex, grid: widgetGrid };
+document.querySelectorAll('[data-widget]').forEach(el => WIDGETS[el.dataset.widget](el));
+
+/* ============================================================
+   SEARCH
+   ============================================================ */
+const q = document.getElementById('q');
+const countEl = document.getElementById('count');
+const emptyEl = document.getElementById('empty');
+const cards = [...document.querySelectorAll('.card, .vs, .callout, .widget')].map(el => ({
+  el, text: el.textContent.toLowerCase(),
+  group: el.closest('.group'), layer: el.closest('.layer')
+}));
+const totalCards = document.querySelectorAll('.card').length;
+document.getElementById('foot-count').textContent = totalCards + ' SNIPPETS · 4 LAYERS';
+
+function filter() {
+  const term = q.value.trim().toLowerCase();
+  if (!term) {
+    cards.forEach(c => c.el.hidden = false);
+    document.querySelectorAll('.group, .layer').forEach(g => g.hidden = false);
+    document.querySelectorAll('.hit').forEach(e => e.classList.remove('hit'));
+    countEl.textContent = totalCards + ' snippets';
+    emptyEl.hidden = true;
+    return;
+  }
+  let hits = 0;
+  cards.forEach(c => {
+    const match = c.text.includes(term);
+    c.el.hidden = !match;
+    c.el.classList.toggle('hit', match);
+    if (match) hits++;
+  });
+  document.querySelectorAll('.group').forEach(g => {
+    g.hidden = ![...g.querySelector('.cards').children].some(c => !c.hidden);
+  });
+  document.querySelectorAll('.layer').forEach(l => {
+    l.hidden = ![...l.querySelectorAll('.group')].some(g => !g.hidden);
+  });
+  countEl.textContent = hits + ' match' + (hits === 1 ? '' : 'es');
+  emptyEl.hidden = hits > 0;
+}
+q.addEventListener('input', filter);
+filter();
+
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && document.activeElement !== q && !e.target.matches('input, textarea')) {
+    e.preventDefault(); q.focus(); q.select();
+  }
+  if (e.key === 'Escape' && document.activeElement === q) { q.value = ''; filter(); q.blur(); }
+});
+
+/* ============================================================
+   RAIL SCROLL SPY
+   ============================================================ */
+const links = [...rail.querySelectorAll('a')];
+if (typeof IntersectionObserver !== 'undefined') {
+const spy = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + en.target.id));
+  });
+}, { rootMargin: '-90px 0px -70% 0px' });
+document.querySelectorAll('.group').forEach(g => spy.observe(g));
+}
+
+/* ============================================================
+   HERO — THE LAYER STACK
+   ============================================================ */
+const LAYER_HTML =
+  '<div class="promo">' +
+  '<h3>Alarm retrofit</h3>' +
+  '<p>DC 46 — 14 doors scheduled.</p>' +
+  '<button id="go">Mark complete</button>' +
+  '<p id="status"></p>' +
+  '</div>';
+
+const LAYER_CSS =
+  'body{margin:0;font:14px/1.5 system-ui,sans-serif;background:#0B0D18;color:#E9ECF7;padding:14px}' +
+  '.promo{border:1px solid #6E8CFF55;border-radius:10px;padding:14px;background:linear-gradient(135deg,#6E8CFF22,#FF6B3D14)}' +
+  'h3{margin:0 0 4px;font-size:16px;color:#FFC940;letter-spacing:-.02em}' +
+  'p{margin:0 0 10px;color:#8E96B8;font-size:13px}' +
+  'button{background:#FF6B3D;color:#08090F;border:0;border-radius:7px;padding:8px 14px;font-weight:700;cursor:pointer}' +
+  '#status{color:#38D9A9;margin:8px 0 0;font-weight:600}';
+
+const LAYER_JS =
+  'document.getElementById("go").addEventListener("click",function(){' +
+  'document.getElementById("status").textContent="✓ 14 doors marked complete";});';
+
+const plates = {
+  html: document.getElementById('plate-html'),
+  css: document.getElementById('plate-css'),
+  js: document.getElementById('plate-js')
+};
+const stageOut = document.getElementById('stage-out');
+const stageHint = document.getElementById('stage-hint');
+const on = { html: true, css: true, js: true };
+
+const HINTS = {
+  '111': 'All three on — click a plate to switch a layer off',
+  '011': 'No HTML: nothing to style and nothing to click. Structure comes first.',
+  '101': 'No CSS: the content is all still there, just unstyled. Notice it still works.',
+  '110': 'No JS: it looks perfect and the button does nothing.',
+  '001': 'HTML and JS only: functional, unstyled — how the web looked in 1996.',
+  '010': 'CSS and JS with no markup: styling and scripting an empty room.',
+  '100': 'HTML only: the raw document. Every page degrades to this.',
+  '000': 'Nothing left. This is a blank tab.'
+};
+
+function renderStage() {
+  const body = on.html ? LAYER_HTML : '';
+  const style = on.css ? '<style>' + LAYER_CSS + '</style>' : '<style>body{margin:0;padding:14px;font-family:system-ui}</style>';
+  const script = on.js && on.html ? '<script>' + LAYER_JS + '<\/script>' : '';
+  stageOut.srcdoc = style + body + script;
+  const key = (on.html ? 1 : 0) + '' + (on.css ? 1 : 0) + '' + (on.js ? 1 : 0);
+  stageHint.textContent = HINTS[key];
+}
+const chips = {};
+document.querySelectorAll('.toggles button').forEach(b => { chips[b.dataset.layer] = b; });
+
+function toggleLayer(k) {
+  on[k] = !on[k];
+  plates[k].setAttribute('aria-pressed', String(on[k]));
+  chips[k].setAttribute('aria-pressed', String(on[k]));
+  renderStage();
+}
+Object.keys(plates).forEach(k => {
+  plates[k].addEventListener('click', () => toggleLayer(k));
+  chips[k].addEventListener('click', () => toggleLayer(k));
+});
+renderStage();
+
+</script>
+</body>
+</html>
